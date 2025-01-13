@@ -21,20 +21,25 @@
                 exit;
             }
             
-            $course = $this->courseModel->getCourseById($id);
+            // Get course details with chapters
+            $course = $this->courseModel->getCourseWithDetails($id);
             if (!$course) {
                 header('Location: /courses');
                 exit;
             }
             
-            // Vérifier si l'utilisateur est connecté et inscrit au cours
+            // Get chapters with their content
+            $chapters = $this->courseModel->getCourseChaptersWithContent($id);
+            
+            // Check enrollment
             $isEnrolled = false;
             if (isset($_SESSION['user_id'])) {
                 $isEnrolled = $this->courseModel->isStudentEnrolled($_SESSION['user_id'], $id);
             }
             
-            $this->render('components/couresView', [
+            $this->render('components/courseView', [
                 'course' => $course,
+                'chapters' => $chapters,
                 'isEnrolled' => $isEnrolled
             ]);
         }

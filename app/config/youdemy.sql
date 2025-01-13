@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : dim. 12 jan. 2025 à 18:29
+-- Généré le : lun. 13 jan. 2025 à 13:37
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -46,6 +46,53 @@ INSERT INTO `categories` (`id`, `name`, `description`, `created_at`) VALUES
 (5, 'Business', 'Business strategy and management', '2025-01-12 17:01:18'),
 (6, 'Marketing', 'Digital marketing and SEO', '2025-01-12 17:01:18'),
 (7, 'Languages', 'Learn programming languages', '2025-01-12 17:01:18');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `chapters`
+--
+
+CREATE TABLE `chapters` (
+  `id` int(11) NOT NULL,
+  `course_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `chapters`
+--
+
+INSERT INTO `chapters` (`id`, `course_id`, `title`, `description`, `created_at`) VALUES
+(1, 1, 'Introduction', 'Premier chapitre du cours', '2025-01-13 10:46:38'),
+(2, 1, 'Bases', 'Les concepts de base', '2025-01-13 10:46:38'),
+(3, 2, 'Démarrage', 'Comment commencer', '2025-01-13 10:46:38');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `chapter_content`
+--
+
+CREATE TABLE `chapter_content` (
+  `id` int(11) NOT NULL,
+  `chapter_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `type` enum('video','document') NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `original_name` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `chapter_content`
+--
+
+INSERT INTO `chapter_content` (`id`, `chapter_id`, `title`, `type`, `file_path`, `original_name`, `created_at`) VALUES
+(1, 1, 'PHP Introduction', 'video', 'public/uploads/videos/course_1/chapter_1/6784f89bce638_php intro.mp4', 'php intro.mp4', '2025-01-13 11:27:23'),
+(2, 1, 'INTRO INTO PHP LANGUAGE', 'video', 'uploads/videos/course_1/chapter_1/678508cd88119_php intro.mp4', 'php intro.mp4', '2025-01-13 12:36:29');
 
 -- --------------------------------------------------------
 
@@ -115,6 +162,28 @@ CREATE TABLE `course_tags` (
   `tag_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `course_tags`
+--
+
+INSERT INTO `course_tags` (`course_id`, `tag_id`) VALUES
+(1, 1),
+(1, 10),
+(2, 1),
+(2, 2),
+(2, 9),
+(3, 4),
+(3, 10),
+(4, 5),
+(4, 6),
+(5, 4),
+(5, 7),
+(6, 6),
+(6, 8),
+(6, 9),
+(7, 3),
+(7, 5);
+
 -- --------------------------------------------------------
 
 --
@@ -128,6 +197,20 @@ CREATE TABLE `enrollments` (
   `enrollment_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `enrollments`
+--
+
+INSERT INTO `enrollments` (`id`, `student_id`, `course_id`, `enrollment_date`) VALUES
+(1, 4, 1, '2025-01-12 19:16:07'),
+(2, 4, 2, '2025-01-12 19:16:07'),
+(3, 4, 3, '2025-01-12 19:16:07'),
+(4, 7, 2, '2025-01-12 19:16:07'),
+(5, 7, 4, '2025-01-12 19:16:07'),
+(6, 7, 6, '2025-01-12 19:16:07'),
+(7, 5, 1, '2025-01-12 19:16:07'),
+(8, 5, 5, '2025-01-12 19:16:07');
+
 -- --------------------------------------------------------
 
 --
@@ -138,6 +221,22 @@ CREATE TABLE `tags` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `tags`
+--
+
+INSERT INTO `tags` (`id`, `name`) VALUES
+(10, 'Backend'),
+(7, 'Data Analysis'),
+(9, 'Frontend'),
+(2, 'JavaScript'),
+(5, 'Mobile'),
+(1, 'PHP'),
+(4, 'Python'),
+(3, 'React'),
+(6, 'UI/UX'),
+(8, 'Web Design');
 
 -- --------------------------------------------------------
 
@@ -178,6 +277,20 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `status`, `profi
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `chapters`
+--
+ALTER TABLE `chapters`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `course_id` (`course_id`);
+
+--
+-- Index pour la table `chapter_content`
+--
+ALTER TABLE `chapter_content`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `chapter_id` (`chapter_id`);
 
 --
 -- Index pour la table `courses`
@@ -234,6 +347,18 @@ ALTER TABLE `categories`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
+-- AUTO_INCREMENT pour la table `chapters`
+--
+ALTER TABLE `chapters`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `chapter_content`
+--
+ALTER TABLE `chapter_content`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
@@ -249,13 +374,13 @@ ALTER TABLE `course_content`
 -- AUTO_INCREMENT pour la table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pour la table `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `users`
@@ -266,6 +391,18 @@ ALTER TABLE `users`
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `chapters`
+--
+ALTER TABLE `chapters`
+  ADD CONSTRAINT `chapters_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`);
+
+--
+-- Contraintes pour la table `chapter_content`
+--
+ALTER TABLE `chapter_content`
+  ADD CONSTRAINT `chapter_content_ibfk_1` FOREIGN KEY (`chapter_id`) REFERENCES `chapters` (`id`);
 
 --
 -- Contraintes pour la table `courses`

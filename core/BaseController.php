@@ -2,6 +2,9 @@
 
 class BaseController
 {
+    public function __construct() {
+        // Empty constructor is fine
+    }
 
     protected function renderDashboard($view, $data = [])
     {

@@ -36,14 +36,37 @@ CREATE TABLE courses (
 );
 
 -- Table course_content
-CREATE TABLE course_content (
+-- CREATE TABLE course_content (
+--     id INT PRIMARY KEY AUTO_INCREMENT,
+--     course_id INT,
+--     title VARCHAR(255) NOT NULL,
+--     type ENUM('video', 'document') NOT NULL,
+--     content_url VARCHAR(255) NOT NULL,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     FOREIGN KEY (course_id) REFERENCES courses(id)
+-- );
+
+
+-- Table chapters
+CREATE TABLE chapters (
     id INT PRIMARY KEY AUTO_INCREMENT,
     course_id INT,
     title VARCHAR(255) NOT NULL,
-    type ENUM('video', 'document') NOT NULL,
-    content_url VARCHAR(255) NOT NULL,
+    description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+-- Table chapter_content
+CREATE TABLE chapter_content (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    chapter_id INT,
+    title VARCHAR(255) NOT NULL,
+    type ENUM('video', 'document') NOT NULL,
+    file_path VARCHAR(255) NOT NULL,  -- hna ghadi n7to path dyal file
+    original_name VARCHAR(255),       -- smiya li dkhl biha l'user
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chapter_id) REFERENCES chapters(id)
 );
 
 -- Autres tables restent les mêmes
@@ -169,6 +192,10 @@ INSERT INTO enrollments (student_id, course_id) VALUES
 
 -- Les autres insertions restent les mêmes
 
+
+ALTER TABLE chapter_content
+ADD UNIQUE KEY `unique_chapter_video` (chapter_id);
+
 -- Les Cas d jointre
 -- 1. Afficher tous les cours avec leurs enseignants
 SELECT c.title, u.name as teacher_name
@@ -257,3 +284,9 @@ FROM categories cat
 LEFT JOIN courses c ON cat.id = c.category_id
 LEFT JOIN enrollments e ON c.id = e.course_id
 GROUP BY cat.id, c.id;
+
+-- Zid chi data de test (optionnel)
+INSERT INTO chapters (course_id, title, description) VALUES
+(1, 'Introduction', 'Premier chapitre du cours'),
+(1, 'Bases', 'Les concepts de base'),
+(2, 'Démarrage', 'Comment commencer');
