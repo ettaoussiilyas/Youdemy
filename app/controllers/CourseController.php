@@ -53,6 +53,12 @@
             $courses = $this->courseModel->getCourseByTeacher($teacher);
             $this->render('course', ['courses' => $courses]);
         }
+
+        public function showHome() {
+            // Get limited number of courses for homepage
+            $courses = $this->courseModel->getAllCourses();
+            $this->render('Home', ['courses' => $courses]);
+        }
         
 
 

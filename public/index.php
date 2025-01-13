@@ -19,7 +19,7 @@ $router = new Router();
 Route::setRouter($router);
 
 // Auth Routes
-Route::get('/', [AuthController::class, 'showHome']);
+Route::get('/', [CourseController::class, 'showHome']);
 Route::get('/home', [AuthController::class, 'showHome']);
 
 // Course Routes

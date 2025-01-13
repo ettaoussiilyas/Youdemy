@@ -11,7 +11,7 @@
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-violet-600 text-white shadow-lg absolute w-full z-10">
+    <nav class="bg-violet-600 text-white shadow-lg fixed w-full z-10">
         <div class="max-w-7xl mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <h1 class="text-xl font-bold">Youdemy</h1>
@@ -23,8 +23,5 @@
         </div>
     </nav>
 
-    <!-- Ajout d'un div pour créer l'espace sous la navbar -->
-    <div class="">
-        <div class="flex min-h-screen">
-</body>
-</html> 
+    <!-- Main content container -->
+    <div class="pt-16"> <!-- Added padding-top to account for fixed navbar -->

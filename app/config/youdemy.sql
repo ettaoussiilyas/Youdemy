@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 13 jan. 2025 à 13:37
+-- Généré le : lun. 13 jan. 2025 à 19:40
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -68,7 +68,8 @@ CREATE TABLE `chapters` (
 INSERT INTO `chapters` (`id`, `course_id`, `title`, `description`, `created_at`) VALUES
 (1, 1, 'Introduction', 'Premier chapitre du cours', '2025-01-13 10:46:38'),
 (2, 1, 'Bases', 'Les concepts de base', '2025-01-13 10:46:38'),
-(3, 2, 'Démarrage', 'Comment commencer', '2025-01-13 10:46:38');
+(3, 2, 'Démarrage', 'Comment commencer', '2025-01-13 10:46:38'),
+(4, 1, 'Chapter 3 From /chapter/create?course=1', 'ghir hara wkan', '2025-01-13 16:03:52');
 
 -- --------------------------------------------------------
 
@@ -91,8 +92,8 @@ CREATE TABLE `chapter_content` (
 --
 
 INSERT INTO `chapter_content` (`id`, `chapter_id`, `title`, `type`, `file_path`, `original_name`, `created_at`) VALUES
-(1, 1, 'PHP Introduction', 'video', 'public/uploads/videos/course_1/chapter_1/6784f89bce638_php intro.mp4', 'php intro.mp4', '2025-01-13 11:27:23'),
-(2, 1, 'INTRO INTO PHP LANGUAGE', 'video', 'uploads/videos/course_1/chapter_1/678508cd88119_php intro.mp4', 'php intro.mp4', '2025-01-13 12:36:29');
+(2, 1, 'INTRO INTO PHP LANGUAGE', 'video', 'uploads/videos/course_1/chapter_1/678508cd88119_php intro.mp4', 'php intro.mp4', '2025-01-13 12:36:29'),
+(3, 2, 'SYNTAX and Varibles', 'video', 'uploads/videos/course_1/chapter_2/67852bad8e3c5_php intro.mp4', 'php intro.mp4', '2025-01-13 15:05:17');
 
 -- --------------------------------------------------------
 
@@ -122,34 +123,6 @@ INSERT INTO `courses` (`id`, `title`, `description`, `teacher_id`, `category_id`
 (5, 'Data Analysis', 'Learn data analysis with Python', 2, 3, 'https://placehold.co/600x400?text=Data+Analysis', '2025-01-12 17:01:18'),
 (6, 'Web Design', 'Master web design principles', 6, 4, 'https://placehold.co/600x400?text=Web+Design', '2025-01-12 17:01:18'),
 (7, 'React Native', 'Build mobile apps with React', 3, 2, 'https://placehold.co/600x400?text=React+Native', '2025-01-12 17:01:18');
-
--- --------------------------------------------------------
-
---
--- Structure de la table `course_content`
---
-
-CREATE TABLE `course_content` (
-  `id` int(11) NOT NULL,
-  `course_id` int(11) DEFAULT NULL,
-  `title` varchar(255) NOT NULL,
-  `type` enum('video','document') NOT NULL,
-  `content_url` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `course_content`
---
-
-INSERT INTO `course_content` (`id`, `course_id`, `title`, `type`, `content_url`, `created_at`) VALUES
-(1, 1, 'Introduction to PHP', 'video', 'https://www.youtube.com/embed/sample1', '2025-01-12 17:01:18'),
-(2, 1, 'PHP Documentation', 'document', 'https://drive.google.com/sample1', '2025-01-12 17:01:18'),
-(3, 2, 'JavaScript Basics', 'video', 'https://www.youtube.com/embed/sample2', '2025-01-12 17:01:18'),
-(4, 2, 'JS Exercises', 'document', 'https://drive.google.com/sample2', '2025-01-12 17:01:18'),
-(5, 3, 'Python Setup', 'video', 'https://www.youtube.com/embed/sample3', '2025-01-12 17:01:18'),
-(6, 4, 'Design Guidelines', 'document', 'https://drive.google.com/sample3', '2025-01-12 17:01:18'),
-(7, 5, 'Data Analysis Intro', 'video', 'https://www.youtube.com/embed/sample4', '2025-01-12 17:01:18');
 
 -- --------------------------------------------------------
 
@@ -290,7 +263,7 @@ ALTER TABLE `chapters`
 --
 ALTER TABLE `chapter_content`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `chapter_id` (`chapter_id`);
+  ADD UNIQUE KEY `unique_chapter_video` (`chapter_id`);
 
 --
 -- Index pour la table `courses`
@@ -299,13 +272,6 @@ ALTER TABLE `courses`
   ADD PRIMARY KEY (`id`),
   ADD KEY `teacher_id` (`teacher_id`),
   ADD KEY `category_id` (`category_id`);
-
---
--- Index pour la table `course_content`
---
-ALTER TABLE `course_content`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `course_id` (`course_id`);
 
 --
 -- Index pour la table `course_tags`
@@ -350,24 +316,18 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT pour la table `chapters`
 --
 ALTER TABLE `chapters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `chapter_content`
 --
 ALTER TABLE `chapter_content`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT pour la table `course_content`
---
-ALTER TABLE `course_content`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
@@ -410,12 +370,6 @@ ALTER TABLE `chapter_content`
 ALTER TABLE `courses`
   ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `courses_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
-
---
--- Contraintes pour la table `course_content`
---
-ALTER TABLE `course_content`
-  ADD CONSTRAINT `course_content_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`);
 
 --
 -- Contraintes pour la table `course_tags`
