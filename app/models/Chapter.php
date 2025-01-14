@@ -1,5 +1,9 @@
 <?php
 class Chapter extends Db {
+    public function __construct() {
+        parent::__construct();
+    }
+
     public function create($data) {
         try {
             $sql = "INSERT INTO chapters (course_id, title, description) 
@@ -55,5 +59,80 @@ class Chapter extends Db {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->fetch();
+    }
+
+    public function getCourseChapters($courseId) {
+        $query = "SELECT 
+                    ch.*,
+                    cc.type as content_type,
+                    cc.file_path
+                 FROM chapters ch
+                 LEFT JOIN chapter_content cc ON ch.id = cc.chapter_id
+                 WHERE ch.course_id = ?
+                 ORDER BY ch.id";
+                 
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$courseId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function update($data) {
+        try {
+            $this->conn->beginTransaction();
+
+            $sql = "UPDATE chapters 
+                    SET title = :title, 
+                        description = :description 
+                    WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($sql);
+            $result = $stmt->execute([
+                ':title' => $data['title'],
+                ':description' => $data['description'],
+                ':id' => $data['id']
+            ]);
+
+            if (!$result) {
+                throw new Exception("Error updating chapter");
+            }
+
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            error_log("Error updating chapter: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateContent($data) {
+        try {
+            $this->conn->beginTransaction();
+
+            $sql = "UPDATE chapter_content 
+                    SET file_path = :file_path,
+                        original_name = :original_name 
+                    WHERE chapter_id = :chapter_id";
+            
+            $stmt = $this->conn->prepare($sql);
+            $result = $stmt->execute([
+                ':file_path' => $data['file_path'],
+                ':original_name' => $data['original_name'],
+                ':chapter_id' => $data['chapter_id']
+            ]);
+
+            if (!$result) {
+                throw new Exception("Error updating chapter content");
+            }
+
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            error_log("Error updating chapter content: " . $e->getMessage());
+            return false;
+        }
     }
 } 

@@ -55,7 +55,7 @@
 
                     <div class="flex items-center justify-between pt-4 border-t">
                         <div class="flex space-x-2">
-                            <a href="/teacher/course/edit/<?php echo $course['id']; ?>" 
+                            <a href="/teacher/course/edit?id=<?php echo $course['id']; ?>" 
                                class="text-blue-600 hover:text-blue-700">
                                 <i class="fas fa-edit"></i>
                             </a>
@@ -66,7 +66,7 @@
                             </button>
                          
                         </div>
-                        <a href="/teacher/course/<?php echo $course['id']; ?>" 
+                        <a href="/teacher/course/edit?id=<?php echo $course['id']; ?>" 
                            class="text-blue-600 hover:text-blue-700 flex items-center">
                            Manage
                             <i class="fas fa-arrow-right ml-2"></i>

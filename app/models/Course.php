@@ -265,6 +265,104 @@
             }
         }
 
+        public function update($data) {
+            try {
+                $this->conn->beginTransaction();
+
+                // Update course basic info
+                $sql = "UPDATE courses 
+                        SET title = :title, 
+                            description = :description, 
+                            category_id = :category_id 
+                        WHERE id = :id";
+                
+                $stmt = $this->conn->prepare($sql);
+                $result = $stmt->execute([
+                    ':title' => $data['title'],
+                    ':description' => $data['description'],
+                    ':category_id' => $data['category_id'],
+                    ':id' => $data['id']
+                ]);
+
+                if (!$result) {
+                    throw new Exception("Error updating course");
+                }
+
+                $this->conn->commit();
+                return true;
+
+            } catch (Exception $e) {
+                $this->conn->rollBack();
+                error_log("Error updating course: " . $e->getMessage());
+                return false;
+            }
+        }
+
+        public function getTeacherStats($teacherId) {
+            try {
+                // Get total views/interactions per course
+                $sql = "SELECT 
+                        c.title,
+                        COUNT(DISTINCT e.student_id) as student_count,
+                        cat.name as category_name,
+                        c.created_at,
+                        (
+                            SELECT COUNT(*) 
+                            FROM chapters 
+                            WHERE course_id = c.id
+                        ) as chapter_count
+                    FROM courses c
+                    LEFT JOIN enrollments e ON c.id = e.course_id
+                    LEFT JOIN categories cat ON c.category_id = cat.id
+                    WHERE c.teacher_id = ?
+                    GROUP BY c.id
+                    ORDER BY student_count DESC";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$teacherId]);
+                $courseStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Get total stats
+                $totalStats = [
+                    'total_courses' => $this->getTeacherCoursesCount($teacherId),
+                    'total_students' => $this->getTeacherTotalStudents($teacherId),
+                    'total_chapters' => $this->getTeacherTotalChapters($teacherId),
+                    'courses_by_category' => $this->getTeacherCoursesByCategory($teacherId)
+                ];
+
+                return [
+                    'course_stats' => $courseStats,
+                    'total_stats' => $totalStats
+                ];
+            } catch (Exception $e) {
+                error_log("Error getting teacher stats: " . $e->getMessage());
+                return false;
+            }
+        }
+
+        private function getTeacherTotalChapters($teacherId) {
+            $sql = "SELECT COUNT(*) as count 
+                    FROM chapters ch
+                    JOIN courses c ON ch.course_id = c.id
+                    WHERE c.teacher_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$teacherId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+        }
+
+        private function getTeacherCoursesByCategory($teacherId) {
+            $sql = "SELECT 
+                        cat.name,
+                        COUNT(*) as count
+                    FROM courses c
+                    JOIN categories cat ON c.category_id = cat.id
+                    WHERE c.teacher_id = ?
+                    GROUP BY cat.id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$teacherId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
     }
 
 ?>

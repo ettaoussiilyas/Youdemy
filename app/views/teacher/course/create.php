@@ -4,7 +4,7 @@
     require_once __DIR__ . '/../../layouts/sidebareTeacher.php';
 ?>
 <div class="container mx-auto px-4 py-8">
-    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6 mt-20">
         <h1 class="text-2xl font-bold mb-6">Créer un nouveau cours</h1>
 
         <form action="/teacher/course/store" method="POST" enctype="multipart/form-data" class="space-y-6">

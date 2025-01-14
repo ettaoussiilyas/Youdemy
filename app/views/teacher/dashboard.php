@@ -111,7 +111,7 @@
                                 </div>
                             </td>
                             <td class="py-4">
-                                <a href="/teacher/course/<?php echo $course['id']; ?>" 
+                                <a href="/teacher/course/edit?id=<?php echo $course['id']; ?>" 
                                    class="inline-flex items-center px-3 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200">
                                     <i class="fas fa-edit mr-2"></i>
                                     Manage
