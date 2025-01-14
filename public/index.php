@@ -12,7 +12,8 @@ require_once '../core/Route.php';
 require_once '../app/controllers/AuthController.php';
 require_once '../app/controllers/CourseController.php';
 require_once '../app/controllers/ChapterController.php';
-
+require_once '../app/controllers/TeacherController.php';
+require_once '../app/controllers/StudentController.php';
 session_start();
 
 $router = new Router();
@@ -40,9 +41,17 @@ Route::get('/chapter/create', [ChapterController::class, 'showCreateForm']);
 Route::post('/chapter/create', [ChapterController::class, 'createChapter']);
 Route::get('/chapter/add-content', [ChapterController::class, 'showAddContentForm']);
 Route::post('/chapter/add-content', [ChapterController::class, 'addContent']);
+Route::get('/chapter/add-content/course/:courseId/chapter/:chapterId', [ChapterController::class, 'showAddContentForm']);// Alternative format
 
-// Alternative format
-Route::get('/chapter/add-content/course/:courseId/chapter/:chapterId', [ChapterController::class, 'showAddContentForm']);
+// Teacher Routes
+Route::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
+// Teacher routes
+Route::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
+Route::get('/teacher/course/create', [TeacherController::class, 'createCourse']);
+Route::post('/teacher/course/store', [TeacherController::class, 'storeCourse']);
+Route::get('/teacher/course/:id/add-content', [TeacherController::class, 'addContent']);
+Route::post('/teacher/course/content/store', [TeacherController::class, 'storeContent']);
+
 
 
 

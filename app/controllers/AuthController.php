@@ -88,7 +88,7 @@
                         header('Location: /student/profile');
                         break;
                     case 'teacher':
-                        header('Location: /teacher/profile');
+                        header('Location: /teacher/dashboard');
                         break;
                 }
                 exit;

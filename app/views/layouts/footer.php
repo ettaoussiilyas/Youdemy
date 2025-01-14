@@ -1,8 +1,5 @@
-        
-
-    <footer class="bg-gray-900 text-white">
-        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-            <!-- Grid Section -->
+    <footer class="bg-gray-900 text-white w-full mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Brand Section -->
                 <div class="space-y-4">
@@ -50,11 +47,11 @@
                 <div>
                     <h3 class="text-white font-semibold mb-4">Contact</h3>
                     <ul class="space-y-2">
-                        <li class="flex items-center">
+                        <li class="flex items-center text-gray-400">
                             <i class="far fa-envelope mr-2"></i>
                             contact@youdemy.com
                         </li>
-                        <li class="flex items-center">
+                        <li class="flex items-center text-gray-400">
                             <i class="fas fa-phone mr-2"></i>
                             +1 234 567 890
                         </li>
@@ -63,12 +60,12 @@
             </div>
 
             <!-- Bottom Bar -->
-            <div class="border-t border-gray-800 mt-12 pt-8">
-                <p class="text-center text-sm">
-                    © 2025 Youdemy. Tous droits réservés.
+            <div class="border-t border-gray-800 mt-8 pt-6">
+                <p class="text-center text-sm text-gray-400">
+                    © 2024 Youdemy. Tous droits réservés.
                 </p>
             </div>
         </div>
     </footer>
-    </body>
+</body>
 </html> 

@@ -135,6 +135,46 @@
             return array_values($chapters);
         }
 
+        public function getTeacherCoursesCount($teacherId) {
+            $sql = "SELECT COUNT(*) FROM courses WHERE teacher_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$teacherId]);
+            return $stmt->fetchColumn();
+        }
+
+        public function getTeacherTotalStudents($teacherId) {
+            $sql = "SELECT COUNT(DISTINCT e.student_id) 
+                    FROM courses c 
+                    JOIN enrollments e ON c.id = e.course_id 
+                    WHERE c.teacher_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$teacherId]);
+            return $stmt->fetchColumn();
+        }
+
+        public function getTeacherRecentCourses($teacherId, $limit = 5) {
+            $sql = "SELECT c.*, cat.name as category_name,
+                    (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as student_count
+                    FROM courses c
+                    LEFT JOIN categories cat ON c.category_id = cat.id
+                    WHERE c.teacher_id = ?
+                    ORDER BY c.created_at DESC
+                    LIMIT ?";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue(1, $teacherId, PDO::PARAM_INT);
+            $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        }
+
+        public function getTeacherActiveCoursesCount($teacherId) {
+            $sql = "SELECT COUNT(*) FROM courses WHERE teacher_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$teacherId]);
+            return $stmt->fetchColumn() ?? 0;
+        }
+
     }
 
 ?>
