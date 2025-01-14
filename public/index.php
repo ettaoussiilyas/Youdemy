@@ -27,6 +27,7 @@ Route::get('/login', [AuthController::class, 'showLogin']);
 Route::get('/signup', [AuthController::class, 'showSignup']); 
 Route::post('/login', [AuthController::class, 'loginChecker']);
 Route::post('/signup', [AuthController::class, 'signupChecker']);
+Route::get('/logout', [AuthController::class, 'logout']);
 
 
 // Course Routes

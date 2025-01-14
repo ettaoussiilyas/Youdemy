@@ -3,7 +3,7 @@
 ?>
 
 <!-- Hero Section -->
-<section class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-20">
+<section class="bg-gradient-to-r from-violet-500 to-gray-900 text-white py-20">
     <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto text-center">
             <h1 class="text-4xl md:text-5xl font-bold mb-6">Bienvenue sur Youdemy</h1>

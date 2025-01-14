@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__.'/../../views/layouts/header.php';
 ?>
-<div class="container mx-auto px-4 py-8 mt-20">
+<div class="container mx-auto px-4 py-8 pt-20">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
     
         <?php foreach($courses as $course): ?>
@@ -61,3 +61,4 @@
 
     </div>
 </div>
+<?php require_once __DIR__.'/../layouts/footer.php'; ?>

@@ -9,26 +9,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/js/alerts.js"></script>
 </head>
-<body class="bg-gray-100">
+<body>
     <!-- Navbar -->
     <nav class="bg-violet-600 text-white shadow-lg fixed w-full z-10">
         <div class="max-w-7xl mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <h1 class="text-xl font-bold">Youdemy</h1>
-
                 <div class="space-x-4">
                     <a href="/home" class="hover:text-violet-200">Home</a>
-                    <a href="/courses" class="hover:text-violet-200">Courses</a>
                     <a href="#" class="hover:text-violet-200">Contact</a>
-                    <a href="# class="hover:text-violet-200">About</a>
-                </div>
-                
-                <div class="space-x-4">
-                    <a href="/login" class="hover:text-violet-200 bg-white text-violet-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">Get Started</a>
+                    <a href="#" class="hover:text-violet-200">About</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main content container -->
-    <!-- <div class="pt-16">  -->
+    <!-- <div class="pt-16"> -->
