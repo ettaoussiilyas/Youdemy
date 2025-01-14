@@ -5,13 +5,15 @@
     class AuthController extends BaseController {
 
         private $courseModel;
+        private $userModel;
 
         public function __construct(){
             $this->courseModel = new Course();
+            $this->userModel = new User();
         }
 
         public function showHome(){
-            if($_SERVER['REQUEST_URI'] !== '/home'){
+            if($_SERVER['REQUEST_URI'] !== '/home'){ 
                 header('Location: /home');
                 exit;
             }
@@ -24,49 +26,118 @@
             $this->render('auth/login');
         }
 
+        public function showSignup(){
+            $this->render('auth/signup');
+        }
+
 
 
 
         public function loginChecker(){
-            if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])){
-                $email = $_POST['email'];
-                $password = $_POST['password'];
+            if (!$_SERVER['REQUEST_METHOD'] === 'POST' || !isset($_POST['login'])) {
+                return $this->render('auth/login');
+            }
 
-                if(empty($email) || empty($password)){
-                    return $this->render('auth/login', ['emptyError' => 'Please fill all fields']);
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+
+            if (empty($email) || empty($password)) {
+                return $this->render('auth/login', ['errors' => 'Please fill all fields']);
+            }
+
+            $user = $this->userModel->getUserByEmail($email);
+            
+            if (!$user) {
+                return $this->render('auth/login', ['errors' => 'User not found']);
+            }                 
+            
+            if (!password_verify($password, $user['password'])) {
+                return $this->render('auth/login', ['errors' => 'Invalid password']);
+            }
+
+            if ($user['status'] === 'blocked') {
+                return $this->render('auth/login', ['errors' => 'Your account is blocked']);
+            }
+
+            // Handle teacher-specific statuses
+            if ($user['role'] === 'teacher') {
+                if ($user['status'] === 'review') {
+                    return $this->render('auth/login', ['errors' => 'Your account is Still on Review']);
                 }
-
-                $user = $this->userModel->getUserByEmail($email);
-
-                if(!$user){
-                    return $this->render('auth/login', ['notFoundError' => 'User not found']);
-                }
-
-                   
-                
-                if(!password_verify($password, $user['password'])){
-                    $this->render('auth/login', ['invalidPasswordError' => 'Invalid password']);
-                }
-
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['name'];
-                $_SESSION['user_profile_pic'] = $user['profile_pic'];
-                $_SESSION['user_email'] = $user['email'  ];
-                
-                $status = $this->userModel->getStatus($user['id']);
-                $_SESSION['status'] = $status;
-
-                $id= (int)$user['id'];
-                if($user['role'] === 'admin'){
-                    header('Location: /admin');
-                    exit;
-                }else{
-                    header('Location: /user/profile');
-                    exit;
+                if ($user['status'] === 'blocked') {
+                    return $this->render('auth/login', ['errors' => 'Your account is blocked']);
                 }
             }
-            
-            $this->render('auth/login');
+
+            // Only proceed if user is active
+            if ($user['status'] === 'active') {
+                // Set common session variables
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_profile_image'] = $user['profile_image'];
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_status'] = $user['status'];
+                $_SESSION['user_role'] = $user['role'];
+
+                // Redirect based on role
+                switch ($user['role']) {
+                    case 'admin':
+                        header('Location: /admin');
+                        break;
+                    case 'student':
+                        header('Location: /student/profile');
+                        break;
+                    case 'teacher':
+                        header('Location: /teacher/profile');
+                        break;
+                }
+                exit;
+            }
+
+            // Fallback for any unexpected status
+            return $this->render('auth/login', ['errors' => 'Invalid account status']);
+        }
+
+        public function signupChecker(){
+            if (!$_SERVER['REQUEST_METHOD'] === 'POST' || !isset($_POST['signup'])) {
+                return $this->render('auth/signup');
+            }
+
+            $name = $_POST['full_name'];
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+            $password_confirmed = $_POST['password_confirmed'];
+            $role = $_POST['role'];
+
+
+            if(empty($name) || empty($email) || empty($password) || empty($password_confirmed) || empty($role)){
+                return $this->render('auth/signup', ['errors' => 'Please fill all fields']);
+            }
+            if($password !== $password_confirmed){
+                return $this->render('auth/signup', ['errors' => 'Passwords do not match']);
+            }
+            if($role != 'student' && $role != 'teacher'){
+                return $this->render('auth/signup', ['errors' => 'Invalid role']);
+            }
+            if($this->userModel->getUserByEmail($email)){
+                return $this->render('auth/signup', ['errors' => 'Email already exists']);
+            }
+            if(strlen($password) < 4){
+                return $this->render('auth/signup', ['errors' => 'Password must be at least 4 characters long']);
+            }
+            if(strlen($name) < 8){
+                return $this->render('auth/signup', ['errors' => 'Name must be at least 8 characters long']);
+            }
+
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+            $created = $this->userModel->createUser($name, $email, $password_hash, $role);
+
+            if($created){
+                return $this->render('auth/login', ['success' => 'Account created successfully']);
+            }else{
+                return $this->render('auth/signup', ['errors' => 'Failed to create account']);
+            }
         }
 
         public function logout(){

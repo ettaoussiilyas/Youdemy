@@ -9,7 +9,7 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('student', 'teacher', 'admin') NOT NULL,
-    status ENUM('active', 'blocked') NOT NULL,
+    status ENUM('active', 'blocked', 'review') NOT NULL,
     profile_image VARCHAR(255) DEFAULT 'https://ui-avatars.com/api/?name=User',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

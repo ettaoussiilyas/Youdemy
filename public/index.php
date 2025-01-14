@@ -18,9 +18,16 @@ session_start();
 $router = new Router();
 Route::setRouter($router);
 
+
+
 // Auth Routes
 Route::get('/', [CourseController::class, 'showHome']);
-Route::get('/home', [AuthController::class, 'showHome']);
+Route::get('/home', [CourseController::class, 'showHome']);
+Route::get('/login', [AuthController::class, 'showLogin']);
+Route::get('/signup', [AuthController::class, 'showSignup']); 
+Route::post('/login', [AuthController::class, 'loginChecker']);
+Route::post('/signup', [AuthController::class, 'signupChecker']);
+
 
 // Course Routes
 Route::get('/course', [CourseController::class, 'getAllCourses']);
