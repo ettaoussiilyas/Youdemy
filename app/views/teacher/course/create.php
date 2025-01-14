@@ -3,11 +3,11 @@
     require_once __DIR__ . '/../../layouts/headerDashboard.php';
     require_once __DIR__ . '/../../layouts/sidebareTeacher.php';
 ?>
-<div class="container mx-auto px-4 py-8 mt-16">
+<div class="container mx-auto px-4 py-8">
     <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
         <h1 class="text-2xl font-bold mb-6">Créer un nouveau cours</h1>
 
-        <form action="/teacher/course/store" method="POST" class="space-y-6">
+        <form action="/teacher/course/store" method="POST" enctype="multipart/form-data" class="space-y-6">
             <!-- Course Details -->
             <div class="border-b pb-6">
                 <h2 class="text-lg font-semibold mb-4">Informations du cours</h2>
@@ -45,22 +45,52 @@
             <!-- Chapters Section -->
             <div class="space-y-4">
                 <h2 class="text-lg font-semibold">Chapitres du cours</h2>
-                <div id="chapters-container" class="space-y-4">
+                <div id="chapters-container" class="space-y-6">
                     <!-- Template for a chapter -->
                     <div class="chapter-item border rounded-md p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <input type="text" name="chapters[0][title]" 
-                                   placeholder="Titre du chapitre" required
-                                   class="w-2/3 px-3 py-2 border border-gray-300 rounded-md">
-                            <select name="chapters[0][type]" required
-                                    class="w-1/4 px-3 py-2 border border-gray-300 rounded-md">
-                                <option value="video">Vidéo</option>
-                                <option value="document">Document</option>
-                            </select>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Titre du chapitre
+                                </label>
+                                <input type="text" name="chapters[0][title]" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description
+                                </label>
+                                <textarea name="chapters[0][description]" rows="2"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Type de contenu
+                                    </label>
+                                    <select name="chapters[0][type]" required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
+                                        <option value="video">Vidéo</option>
+                                        <option value="document">Document</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Fichier
+                                    </label>
+                                    <input type="file" name="chapters[0][content]" required
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
+                                           accept=".mp4,.webm,.pdf,.doc,.docx">
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        Vidéos: MP4, WEBM (max 100MB)<br>
+                                        Documents: PDF, DOC, DOCX
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <textarea name="chapters[0][description]" 
-                                  placeholder="Description du chapitre" rows="2"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
                     </div>
                 </div>
 
@@ -92,22 +122,64 @@ document.getElementById('add-chapter').addEventListener('click', function() {
     const container = document.getElementById('chapters-container');
     const template = `
         <div class="chapter-item border rounded-md p-4">
-            <div class="flex justify-between items-center mb-2">
-                <input type="text" name="chapters[${chapterCount}][title]" 
-                       placeholder="Titre du chapitre" required
-                       class="w-2/3 px-3 py-2 border border-gray-300 rounded-md">
-                <select name="chapters[${chapterCount}][type]" required
-                        class="w-1/4 px-3 py-2 border border-gray-300 rounded-md">
-                    <option value="video">Vidéo</option>
-                    <option value="document">Document</option>
-                </select>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Titre du chapitre
+                    </label>
+                    <input type="text" name="chapters[${chapterCount}][title]" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                    </label>
+                    <textarea name="chapters[${chapterCount}][description]" rows="2"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Type de contenu
+                        </label>
+                        <select name="chapters[${chapterCount}][type]" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
+                            <option value="video">Vidéo</option>
+                            <option value="document">Document</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Fichier
+                        </label>
+                        <input type="file" name="chapters[${chapterCount}][content]" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
+                               accept=".mp4,.webm,.pdf,.doc,.docx">
+                        <p class="mt-1 text-xs text-gray-500">
+                            Vidéos: MP4, WEBM (max 100MB)<br>
+                            Documents: PDF, DOC, DOCX
+                        </p>
+                    </div>
+                </div>
             </div>
-            <textarea name="chapters[${chapterCount}][description]" 
-                      placeholder="Description du chapitre" rows="2"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', template);
     chapterCount++;
+});
+
+// Update accept attribute based on type selection
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('chapter-type')) {
+        const fileInput = e.target.closest('.chapter-item').querySelector('.chapter-file');
+        if (e.target.value === 'video') {
+            fileInput.accept = '.mp4,.webm';
+        } else {
+            fileInput.accept = '.pdf,.doc,.docx';
+        }
+    }
 });
 </script> 

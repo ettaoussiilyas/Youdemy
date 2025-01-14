@@ -44,14 +44,13 @@ Route::post('/chapter/add-content', [ChapterController::class, 'addContent']);
 Route::get('/chapter/add-content/course/:courseId/chapter/:chapterId', [ChapterController::class, 'showAddContentForm']);// Alternative format
 
 // Teacher Routes
-Route::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
-// Teacher routes
+
 Route::get('/teacher/dashboard', [TeacherController::class, 'dashboard']);
 Route::get('/teacher/course/create', [TeacherController::class, 'createCourse']);
 Route::post('/teacher/course/store', [TeacherController::class, 'storeCourse']);
-Route::get('/teacher/course/:id/add-content', [TeacherController::class, 'addContent']);
 Route::post('/teacher/course/content/store', [TeacherController::class, 'storeContent']);
-
+Route::get('/teacher/mycourses', [TeacherController::class, 'myCourses']);
+Route::get('/teacher/course/delete', [TeacherController::class, 'deleteCourse']);
 
 
 

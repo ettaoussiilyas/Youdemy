@@ -30,14 +30,13 @@
         </a>
 
         <!-- My Courses Link -->
-        <a href="/teacher/courses" 
+        <a href="/teacher/mycourses" 
            class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200
-                  <?php echo ($_SERVER['REQUEST_URI'] === '/teacher/courses') ? 'bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30' : 'hover:bg-white/10'; ?>">
+                  <?php echo ($_SERVER['REQUEST_URI'] === '/teacher/mycourses' || $_SERVER['REQUEST_URI'] === '/teacher/courses') ? 'bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30' : 'hover:bg-white/10'; ?>">
             <div class="mr-3 w-9 h-9 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors duration-200">
                 <i class="fas fa-book text-blue-400 group-hover:text-blue-300"></i>
             </div>
             <span class="font-medium">My Courses</span>
-            <span class="ml-auto bg-white/20 text-xs px-2 py-1 rounded-full"><?php echo $totalCourses ?? '0'; ?></span>
         </a>
 
         <!-- Create Course Link -->

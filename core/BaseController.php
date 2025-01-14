@@ -38,7 +38,7 @@ class BaseController
         public function renderTeacher($view, $data = []){
             
             extract($data);
-            include_once __DIR__.'/../app/views/teacher/'.$view.'.php';
+            require_once __DIR__ . "/../app/views/teacher/{$view}.php";
         }
 
         public function renderStudent($view, $data = []){

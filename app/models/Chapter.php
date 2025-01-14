@@ -1,28 +1,43 @@
 <?php
 class Chapter extends Db {
     public function create($data) {
-        $sql = "INSERT INTO chapters (course_id, title, description) 
-                VALUES (?, ?, ?)";
-        
-        return $this->conn->prepare($sql)->execute([
-            $data['course_id'],
-            $data['title'],
-            $data['description']
-        ]);
+        try {
+            $sql = "INSERT INTO chapters (course_id, title, description) 
+                    VALUES (:course_id, :title, :description)";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':course_id' => $data['course_id'],
+                ':title' => $data['title'],
+                ':description' => $data['description']
+            ]);
+
+            return $this->conn->lastInsertId();
+        } catch (PDOException $e) {
+            error_log("Error creating chapter: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function addContent($data) {
-        $sql = "INSERT INTO chapter_content 
-                (chapter_id, title, type, file_path, original_name) 
-                VALUES (?, ?, ?, ?, ?)";
-        
-        return $this->conn->prepare($sql)->execute([
-            $data['chapter_id'],
-            $data['title'],
-            $data['type'],
-            $data['file_path'],
-            $data['original_name']
-        ]);
+        try {
+            $sql = "INSERT INTO chapter_content (chapter_id, title, type, file_path, original_name) 
+                    VALUES (:chapter_id, :title, :type, :file_path, :original_name)";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':chapter_id' => $data['chapter_id'],
+                ':title' => $data['title'],
+                ':type' => $data['type'],
+                ':file_path' => $data['file_path'],
+                ':original_name' => $data['original_name']
+            ]);
+
+            return $this->conn->lastInsertId();
+        } catch (PDOException $e) {
+            error_log("Error adding chapter content: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getChapterContent($chapterId) {

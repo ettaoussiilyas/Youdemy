@@ -38,6 +38,7 @@
                 c.title,
                 c.description,
                 c.thumbnail,
+                c.teacher_id,
                 cat.name as category_name,
                 u.name as teacher_name,
                 u.profile_image as teacher_image,
@@ -54,7 +55,6 @@
             ";
             
             $stmt = $this->conn->prepare($query);
-            // $stmt->bind_param("i", $id);
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         }
@@ -173,6 +173,96 @@
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$teacherId]);
             return $stmt->fetchColumn() ?? 0;
+        }
+
+        public function create($data) {
+            try {
+                $sql = "INSERT INTO courses (title, description, category_id, teacher_id) 
+                        VALUES (:title, :description, :category_id, :teacher_id)";
+                
+                $stmt = $this->conn->prepare($sql);
+                
+                $stmt->execute([
+                    ':title' => $data['title'],
+                    ':description' => $data['description'],
+                    ':category_id' => $data['category_id'],
+                    ':teacher_id' => $data['teacher_id']
+                ]);
+
+                return $this->conn->lastInsertId();
+                
+            } catch (PDOException $e) {
+                error_log("Error creating course: " . $e->getMessage());
+                return false;
+            }
+        }
+
+        public function getTeacherCourses($teacherId) {
+            $sql = "SELECT c.*, cat.name as category_name, 
+                    (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as student_count 
+                    FROM courses c 
+                    LEFT JOIN categories cat ON c.category_id = cat.id 
+                    WHERE c.teacher_id = ?
+                    ORDER BY c.created_at DESC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$teacherId]);
+            return $stmt->fetchAll();
+        }
+
+        public function deleteCourse($courseId) {
+            try {
+                $this->conn->beginTransaction();
+
+                // 1. Get all chapters for this course
+                $sql = "SELECT id FROM chapters WHERE course_id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+                $chapters = $stmt->fetchAll();
+
+                // 2. Delete content files from storage
+                foreach ($chapters as $chapter) {
+                    // Delete chapter content files
+                    $sql = "SELECT file_path FROM chapter_content WHERE chapter_id = ?";
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute([$chapter['id']]);
+                    $contents = $stmt->fetchAll();
+
+                    foreach ($contents as $content) {
+                        if (file_exists($content['file_path'])) {
+                            unlink($content['file_path']); // Delete physical file
+                        }
+                    }
+
+                    // Delete chapter content records
+                    $sql = "DELETE FROM chapter_content WHERE chapter_id = ?";
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute([$chapter['id']]);
+                }
+
+                // 3. Delete chapters
+                $sql = "DELETE FROM chapters WHERE course_id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+
+                // 4. Delete enrollments
+                $sql = "DELETE FROM enrollments WHERE course_id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+
+                // 5. Finally delete the course
+                $sql = "DELETE FROM courses WHERE id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+
+                $this->conn->commit();
+                return true;
+
+            } catch (Exception $e) {
+                $this->conn->rollBack();
+                error_log("Error deleting course: " . $e->getMessage());
+                return false;
+            }
         }
 
     }
