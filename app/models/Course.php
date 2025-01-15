@@ -363,6 +363,47 @@
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        public function getCourseWithChapters($courseId) {
+            $sql = "SELECT 
+                c.*,
+                u.name as teacher_name,
+                (SELECT COUNT(*) FROM chapters WHERE course_id = c.id) as chapter_count,
+                (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count
+            FROM courses c
+            JOIN users u ON c.teacher_id = u.id
+            WHERE c.id = ?";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$courseId]);
+            $course = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if($course) {
+                $sql = "SELECT * FROM chapters WHERE course_id = ? ORDER BY id";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+                $course['chapters'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            
+            return $course;
+        }
+
+        public function getAllAvailable() {
+            $sql = "SELECT 
+                c.*,
+                u.name as teacher_name,
+                (SELECT COUNT(*) FROM chapters WHERE course_id = c.id) as chapter_count,
+                (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count,
+                CASE WHEN e.student_id IS NOT NULL THEN 1 ELSE 0 END as is_enrolled
+            FROM courses c
+            JOIN users u ON c.teacher_id = u.id
+            LEFT JOIN enrollments e ON c.id = e.course_id AND e.student_id = ?
+            ORDER BY c.created_at DESC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$_SESSION['user_id']]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
     }
 
 ?>

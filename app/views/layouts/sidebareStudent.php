@@ -21,8 +21,7 @@
     <nav class="mt-6 px-3">
         <!-- Dashboard Link -->
         <a href="/student/dashboard" 
-           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200
-                  <?php echo ($_SERVER['REQUEST_URI'] === '/student/dashboard') ? 'bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30' : 'hover:bg-white/10'; ?>">
+           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200 hover:bg-white/10">
             <div class="mr-3 w-9 h-9 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors duration-200">
                 <i class="fas fa-home text-violet-400 group-hover:text-violet-300"></i>
             </div>
@@ -31,8 +30,7 @@
 
         <!-- My Courses Link -->
         <a href="/student/courses" 
-           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200
-                  <?php echo ($_SERVER['REQUEST_URI'] === '/student/courses') ? 'bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30' : 'hover:bg-white/10'; ?>">
+           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200 hover:bg-white/10">
             <div class="mr-3 w-9 h-9 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors duration-200">
                 <i class="fas fa-book text-blue-400 group-hover:text-blue-300"></i>
             </div>
@@ -41,8 +39,7 @@
 
         <!-- Browse Courses Link -->
         <a href="/student/browse" 
-           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200
-                  <?php echo ($_SERVER['REQUEST_URI'] === '/student/browse') ? 'bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30' : 'hover:bg-white/10'; ?>">
+           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200 hover:bg-white/10">
             <div class="mr-3 w-9 h-9 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors duration-200">
                 <i class="fas fa-search text-green-400 group-hover:text-green-300"></i>
             </div>
@@ -51,8 +48,7 @@
 
         <!-- Profile Link -->
         <a href="/student/profile" 
-           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200
-                  <?php echo ($_SERVER['REQUEST_URI'] === '/student/profile') ? 'bg-gradient-to-r from-violet-600 to-violet-500 shadow-lg shadow-violet-500/30' : 'hover:bg-white/10'; ?>">
+           class="group flex items-center px-4 py-3 mb-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200 hover:bg-white/10">
             <div class="mr-3 w-9 h-9 rounded-xl bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-colors duration-200">
                 <i class="fas fa-user text-amber-400 group-hover:text-amber-300"></i>
             </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 13 jan. 2025 à 19:40
+-- Généré le : mer. 15 jan. 2025 à 10:27
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -69,7 +69,10 @@ INSERT INTO `chapters` (`id`, `course_id`, `title`, `description`, `created_at`)
 (1, 1, 'Introduction', 'Premier chapitre du cours', '2025-01-13 10:46:38'),
 (2, 1, 'Bases', 'Les concepts de base', '2025-01-13 10:46:38'),
 (3, 2, 'Démarrage', 'Comment commencer', '2025-01-13 10:46:38'),
-(4, 1, 'Chapter 3 From /chapter/create?course=1', 'ghir hara wkan', '2025-01-13 16:03:52');
+(4, 1, 'Chapter 3 From /chapter/create?course=1', 'ghir hara wkan', '2025-01-13 16:03:52'),
+(7, 10, 'Introduction', 'Vidéo à la demande de 3,5 heures\r\n2 exercices pratiques\r\nAccès sur mobiles et TV\r\nAccès illimité\r\nCertificat de fin de formation', '2025-01-14 15:08:15'),
+(8, 10, 'Installation Set-Up', '​\r\n\r\nUn cours peut contenir plusieurs tags (relation many-to-many).\r\nApplication du concept de polymorphisme dans les méthodes suivantes : Ajouter cours et afficher cours.\r\nSystème d’authentification et d’autorisation pour protéger les routes sensibles.', '2025-01-14 15:08:15'),
+(18, 19, 'Cupiditate quae ipsu', 'Dolore amet tenetur', '2025-01-14 19:12:56');
 
 -- --------------------------------------------------------
 
@@ -93,7 +96,10 @@ CREATE TABLE `chapter_content` (
 
 INSERT INTO `chapter_content` (`id`, `chapter_id`, `title`, `type`, `file_path`, `original_name`, `created_at`) VALUES
 (2, 1, 'INTRO INTO PHP LANGUAGE', 'video', 'uploads/videos/course_1/chapter_1/678508cd88119_php intro.mp4', 'php intro.mp4', '2025-01-13 12:36:29'),
-(3, 2, 'SYNTAX and Varibles', 'video', 'uploads/videos/course_1/chapter_2/67852bad8e3c5_php intro.mp4', 'php intro.mp4', '2025-01-13 15:05:17');
+(3, 2, 'SYNTAX and Varibles', 'video', 'uploads/videos/course_1/chapter_2/67852bad8e3c5_php intro.mp4', 'php intro.mp4', '2025-01-13 15:05:17'),
+(5, 7, 'Introduction', 'video', 'uploads/videos/course_10/chapter_7/67867ddf62c9f_yt1z.net - Apprendre le PHP  Chapitre 1, Présentation de PHP.mp4', 'yt1z.net - Apprendre le PHP  Chapitre 1, Présentation de PHP.mp4', '2025-01-14 15:08:15'),
+(6, 8, 'Installation Set-Up', 'video', 'uploads/videos/course_10/chapter_8/67867ddf65afd_yt1z.net - Apprendre le PHP  Chapitre 1, Présentation de PHP.mp4', 'yt1z.net - Apprendre le PHP  Chapitre 1, Présentation de PHP.mp4', '2025-01-14 15:08:15'),
+(15, 18, 'Ad corrupti necessi', 'document', 'uploads/documents/course_19/chapter_18/6786b73822b2b_Lutilisation-des-Traits-en-PHP.pdf', 'Lutilisation-des-Traits-en-PHP.pdf', '2025-01-14 19:12:56');
 
 -- --------------------------------------------------------
 
@@ -116,13 +122,15 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`id`, `title`, `description`, `teacher_id`, `category_id`, `thumbnail`, `created_at`) VALUES
-(1, 'PHP Basics', 'Learn PHP fundamentals', 2, 1, 'https://placehold.co/600x400?text=PHP+Basics', '2025-01-12 17:01:18'),
+(1, 'PHP Basicssssss', 'Learn PHP fundamentals', 2, 5, 'https://placehold.co/600x400?text=PHP+Basics', '2025-01-12 17:01:18'),
 (2, 'JavaScript Mastery', 'Master JavaScript basics', 2, 1, 'https://placehold.co/600x400?text=JavaScript', '2025-01-12 17:01:18'),
 (3, 'Python Programming', 'Introduction to Python', 3, 1, 'https://placehold.co/600x400?text=Python', '2025-01-12 17:01:18'),
 (4, 'Mobile App Design', 'Design beautiful apps', 3, 2, 'https://placehold.co/600x400?text=Mobile+Design', '2025-01-12 17:01:18'),
 (5, 'Data Analysis', 'Learn data analysis with Python', 2, 3, 'https://placehold.co/600x400?text=Data+Analysis', '2025-01-12 17:01:18'),
 (6, 'Web Design', 'Master web design principles', 6, 4, 'https://placehold.co/600x400?text=Web+Design', '2025-01-12 17:01:18'),
-(7, 'React Native', 'Build mobile apps with React', 3, 2, 'https://placehold.co/600x400?text=React+Native', '2025-01-12 17:01:18');
+(7, 'React Native', 'Build mobile apps with React', 3, 2, 'https://placehold.co/600x400?text=React+Native', '2025-01-12 17:01:18'),
+(10, 'Docker Pour Les Débutants', 'Apprenez Docker avec des exercices de codage pratiques. Pour les débutants en DevOps', 6, 1, 'https://placehold.co/600x400?text=Course', '2025-01-14 15:08:15'),
+(19, 'Autem aut explicabo', 'Omnis lorem impedit', 2, 5, 'https://placehold.co/600x400?text=Course', '2025-01-14 19:12:56');
 
 -- --------------------------------------------------------
 
@@ -167,22 +175,24 @@ CREATE TABLE `enrollments` (
   `id` int(11) NOT NULL,
   `student_id` int(11) DEFAULT NULL,
   `course_id` int(11) DEFAULT NULL,
-  `enrollment_date` timestamp NOT NULL DEFAULT current_timestamp()
+  `enrollment_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `progress` int(11) DEFAULT 0,
+  `last_accessed` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `enrollments`
 --
 
-INSERT INTO `enrollments` (`id`, `student_id`, `course_id`, `enrollment_date`) VALUES
-(1, 4, 1, '2025-01-12 19:16:07'),
-(2, 4, 2, '2025-01-12 19:16:07'),
-(3, 4, 3, '2025-01-12 19:16:07'),
-(4, 7, 2, '2025-01-12 19:16:07'),
-(5, 7, 4, '2025-01-12 19:16:07'),
-(6, 7, 6, '2025-01-12 19:16:07'),
-(7, 5, 1, '2025-01-12 19:16:07'),
-(8, 5, 5, '2025-01-12 19:16:07');
+INSERT INTO `enrollments` (`id`, `student_id`, `course_id`, `enrollment_date`, `progress`, `last_accessed`) VALUES
+(1, 4, 1, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(2, 4, 2, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(3, 4, 10, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(4, 7, 2, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(5, 7, 10, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(6, 7, 6, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(7, 4, 10, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50'),
+(8, 4, 5, '2025-01-12 19:16:07', 0, '2025-01-15 09:26:50');
 
 -- --------------------------------------------------------
 
@@ -223,7 +233,7 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('student','teacher','admin') NOT NULL,
-  `status` enum('active','blocked') NOT NULL,
+  `status` enum('active','blocked','review') NOT NULL,
   `profile_image` varchar(255) DEFAULT 'https://ui-avatars.com/api/?name=User',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -233,13 +243,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `status`, `profile_image`, `created_at`) VALUES
-(1, 'Admin User', 'admin@youdemy.com', 'admin', 'admin', 'active', 'https://ui-avatars.com/api/?name=Admin+User', '2025-01-12 17:01:17'),
-(2, 'Ilyas Teacher', 'ilyas@youdemy.com', 'ilyas', 'teacher', 'active', 'https://placehold.co/600x400?text=Course', '2025-01-12 17:01:17'),
-(3, 'Sarah Teacher', 'sara@youdemy.com', 'sara', 'teacher', 'active', 'https://ui-avatars.com/api/?name=Sarah+Teacher', '2025-01-12 17:01:17'),
-(4, 'Ali Student', 'ali@youdemy.com', 'ali', 'student', 'active', 'https://ui-avatars.com/api/?name=Mike+Student', '2025-01-12 17:01:17'),
-(5, 'Sami Wilson', 'sami@youdemy.com', 'sami', 'student', 'blocked', 'https://ui-avatars.com/api/?name=Emma+Wilson', '2025-01-12 17:01:17'),
-(6, 'Sam Brown', 'sam@youdemy.com', 'sam', 'teacher', 'active', 'https://ui-avatars.com/api/?name=David+Brown', '2025-01-12 17:01:17'),
-(7, 'Abir Student', 'abir@youdemy.com', 'abir', 'student', 'active', 'https://placehold.co/600x400?text=Course', '2025-01-12 17:01:17');
+(1, 'Admin User', 'admin@youdemy.com', '$2y$10$ZxZkmasB0wn.4ouFcUmgq.PSMS3TUz3LGFmCdi4DuWQZvD8HiX3OK', 'admin', 'active', 'https://ui-avatars.com/api/?name=Admin+User', '2025-01-12 17:01:17'),
+(2, 'Ilyas Teacher', 'ilyas@youdemy.com', '$2y$10$zcI1TPT4R3D4FHbavJsmXO2Clzwr1w6dpKIVo3wv.ZhqB18pvAIbK', 'teacher', 'active', 'https://placehold.co/600x400?text=Course', '2025-01-12 17:01:17'),
+(3, 'Sarah Teacher', 'sara@youdemy.com', '$2y$10$PGZMJ..zWenKRB9X9wnC9.knC4YWFZMxfP7DXtoY9Lf8rKBqtwE3O', 'teacher', 'active', 'https://ui-avatars.com/api/?name=Sarah+Teacher', '2025-01-12 17:01:17'),
+(4, 'Ali Student', 'ali@youdemy.com', '$2y$10$w9D8k.mPL5ZWZ9mWhFlR7unR/t1r5/FvBUVgRDpjpcVboXwbI2uhK', 'student', 'active', 'https://ui-avatars.com/api/?name=Mike+Student', '2025-01-12 17:01:17'),
+(5, 'Sami Wilson', 'sami@youdemy.com', '$2y$10$Jtk0NRIaPB7gVbshXbCYFe263tQ0zWU82R5YaCFPL5umKN.h5jATa', 'student', 'blocked', 'https://ui-avatars.com/api/?name=Emma+Wilson', '2025-01-12 17:01:17'),
+(6, 'Sam Brown', 'sam@youdemy.com', '$2y$10$69ZWdrNVDtekeWSJPmf34eocz45KwbjOfzoLfQNPPgvpKcWkPPony', 'teacher', 'active', 'https://ui-avatars.com/api/?name=David+Brown', '2025-01-12 17:01:17'),
+(7, 'Abir Student', 'abir@youdemy.com', '$2y$10$195mGcb4QAop6aDIpQ.GZOOzYbOdsnMTuhYLqRQCHUPKC2kxN4FaS', 'student', 'active', 'https://placehold.co/600x400?text=Course', '2025-01-12 17:01:17'),
+(8, 'Test User', 'test@youdemy.com', '$2y$10$D4qySulHMDVIE0JxeF8NT.LbJDhX2xSJ9N2EcMpUpendcMDhWocmq', 'teacher', 'review', 'https://ui-avatars.com/api/?name=User', '2025-01-14 10:24:12'),
+(9, 'Jennifer Clarke', 'sycowisa@mailinator.com', '$2y$10$hjrLAKgV4vt5i1XUutJoPee/Qgok1TW32WA9KlJx3dS/S5G/vIiam', 'teacher', 'review', 'https://ui-avatars.com/api/?name=User', '2025-01-14 11:35:58'),
+(10, 'rana mhalabia', 'rana@youdemy.com', '$2y$10$mOYarUMswqUNXMPF3YJq5ecc6st/47UhyRwsvpAip.Va2YyxVNpby', 'student', 'active', 'https://ui-avatars.com/api/?name=User', '2025-01-14 11:42:07'),
+(11, 'Miranda Justice', 'pisahibe@mailinator.com', '$2y$10$qq879.2dTuL8FVTHJB0Xgurd8mLgAcvNQErC669Stft.3Chj.A12O', 'teacher', 'review', 'https://ui-avatars.com/api/?name=User', '2025-01-14 17:06:30'),
+(12, 'tester123', 'tester@youdemy.com', '$2y$10$NwCyH.T7SQYVgqkppBRE4.gZhi.wyNT8zHY.AnH9NjxcTCW7USFxi', 'teacher', 'review', 'https://ui-avatars.com/api/?name=User', '2025-01-14 17:07:30');
 
 --
 -- Index pour les tables déchargées
@@ -316,19 +331,19 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT pour la table `chapters`
 --
 ALTER TABLE `chapters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `chapter_content`
 --
 ALTER TABLE `chapter_content`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `enrollments`
@@ -346,7 +361,7 @@ ALTER TABLE `tags`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Contraintes pour les tables déchargées
