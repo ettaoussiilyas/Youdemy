@@ -53,7 +53,7 @@ Route::get('/teacher/mycourses', [TeacherController::class, 'myCourses']);
 Route::get('/teacher/course/delete', [TeacherController::class, 'deleteCourse']);
 Route::get('/teacher/course/edit', [TeacherController::class, 'editCourse']);
 Route::post('/teacher/course/update', [TeacherController::class, 'updateCourse']);
-Route::post('/teacher/chapter/delete/:id', [TeacherController::class, 'deleteChapter']);
+Route::post('/teacher/chapter/delete/{id}', [TeacherController::class, 'deleteChapter']);
 Route::get('/teacher/stats', [TeacherController::class, 'showStats']);
 
 

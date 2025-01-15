@@ -135,4 +135,35 @@ class Chapter extends Db {
             return false;
         }
     }
+
+    public function delete($id) {
+        try {
+            $this->conn->beginTransaction();
+
+            // Delete chapter content first (if exists)
+            $sql = "DELETE FROM chapter_content WHERE chapter_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$id]);
+
+            // Then delete the chapter
+            $sql = "DELETE FROM chapters WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $result = $stmt->execute([$id]);
+
+            $this->conn->commit();
+            return $result;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            error_log("Error deleting chapter: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getById($id) {
+        $sql = "SELECT * FROM chapters WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 } 

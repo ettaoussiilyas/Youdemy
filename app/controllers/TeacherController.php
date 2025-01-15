@@ -380,4 +380,33 @@ class TeacherController extends BaseController {
             ]);
         }
     }
+
+    public function deleteChapter($chapterId) {
+        try {
+            // Get chapter info
+            $chapter = $this->chapterModel->getById($chapterId);
+            
+            if (!$chapter) {
+                echo json_encode(['success' => false, 'message' => 'Chapter not found']);
+                return;
+            }
+
+            // Check if course belongs to teacher
+            $course = $this->courseModel->getCourseById($chapter['course_id']);
+            if ($course['teacher_id'] != $_SESSION['user_id']) {
+                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+                return;
+            }
+
+            // Delete chapter
+            if ($this->chapterModel->delete($chapterId)) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error deleting chapter']);
+            }
+
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
 }

@@ -10,10 +10,10 @@
     <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 mt-20">
         <!-- Header -->
         <div class="flex items-center justify-between mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">Modifier le cours</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Edit course</h1>
             <a href="/teacher/mycourses" class="text-gray-600 hover:text-gray-800 transition">
                 <i class="fas fa-arrow-left mr-2"></i>
-                Retour aux cours
+                Back to courses
             </a>
         </div>
 
@@ -23,11 +23,11 @@
 
             <!-- Course Details -->
             <div class="border-b pb-6">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Informations du cours</h2>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Course informations</h2>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Titre du cours
+                            Course title
                         </label>
                         <input type="text" name="title" required 
                                value="<?php echo htmlspecialchars($course['title']); ?>"
@@ -44,7 +44,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Catégorie
+                            Category
                         </label>
                         <select name="category_id" required 
                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition">
@@ -68,7 +68,7 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Titre du chapitre
+                                    Chapter title
                                 </label>
                                 <input type="text" name="existing_chapters[<?php echo $chapter['id']; ?>][title]" 
                                        value="<?php echo htmlspecialchars($chapter['title']); ?>" required
@@ -88,16 +88,16 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Type de contenu actuel
+                                        Current content type
                                     </label>
                                     <p class="text-gray-600 bg-white px-4 py-2 rounded-lg border border-gray-200">
-                                        <?php echo $chapter['content_type'] ?? 'Aucun contenu'; ?>
+                                        <?php echo $chapter['content_type'] ?? 'No content'; ?>
                                     </p>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Nouveau fichier (optionnel)
+                                        New file (optional)
                                     </label>
                                     <input type="file" name="existing_chapters[<?php echo $chapter['id']; ?>][content]"
                                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition chapter-file"
@@ -108,7 +108,7 @@
                             <button type="button" onclick="deleteChapter(<?php echo $chapter['id']; ?>)"
                                     class="flex items-center text-red-600 hover:text-red-700 transition">
                                 <i class="fas fa-trash mr-2"></i>
-                                Supprimer ce chapitre
+                                Delete this chapter
                             </button>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
 
             <!-- New Chapters -->
             <div class="space-y-4">
-                <h2 class="text-lg font-semibold text-gray-800">Nouveaux chapitres</h2>
+                <h2 class="text-lg font-semibold text-gray-800">New chapters</h2>
                 <div id="new-chapters-container" class="space-y-6">
                     <!-- New chapters will be added here -->
                 </div>
@@ -126,19 +126,19 @@
                 <button type="button" id="add-chapter" 
                         class="flex items-center text-violet-600 hover:text-violet-700 transition">
                     <i class="fas fa-plus-circle mr-2"></i>
-                    Ajouter un chapitre
+                    Add a chapter
                 </button>
             </div>
 
             <div class="flex justify-end gap-4 pt-6 border-t">
                 <a href="/teacher/courses" 
                    class="px-6 py-2 text-gray-600 hover:text-gray-800 transition">
-                    Annuler
+                    Cancel
                 </a>
                 <button type="submit" 
                         class="px-6 py-2 bg-gradient-to-r from-violet-600 to-violet-500 text-white rounded-lg hover:from-violet-700 hover:to-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transform hover:scale-105 transition">
                     <i class="fas fa-save mr-2"></i>
-                    Enregistrer les modifications
+                    Save changes
                 </button>
             </div>
         </form>
@@ -155,7 +155,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Titre du chapitre
+                        Chapter title
                     </label>
                     <input type="text" name="new_chapters[${newChapterCount}][title]" required
                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
@@ -172,11 +172,11 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Type de contenu
+                            Content type
                         </label>
                         <select name="new_chapters[${newChapterCount}][type]" required
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
-                            <option value="video">Vidéo</option>
+                            <option value="video">Video</option>
                             <option value="document">Document</option>
                         </select>
                     </div>
@@ -198,20 +198,31 @@ document.getElementById('add-chapter').addEventListener('click', function() {
 });
 
 function deleteChapter(chapterId) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce chapitre ?')) {
+    if (confirm('Are you sure you want to delete this chapter?')) {
         // Send AJAX request to delete chapter
         fetch(`/teacher/chapter/delete/${chapterId}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Remove chapter from DOM
-                const chapterElement = document.querySelector(`[name="existing_chapters[${chapterId}][id]"]`).closest('.chapter-item');
+                // Remove chapter element from DOM
+                const chapterElement = document.querySelector(`input[name="existing_chapters[${chapterId}][id]"]`)
+                    .closest('.chapter-item');
                 chapterElement.remove();
+                
+                // Show success message
+                alert('chapter deleted successfully');
             } else {
-                alert('Erreur lors de la suppression du chapitre');
+                alert('error deleting chapter');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('error deleting chapter');
         });
     }
 }
