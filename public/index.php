@@ -63,7 +63,7 @@ Route::get('/student/browse', [StudentController::class, 'browseCourses']);
 Route::get('/student/course/{id}', [StudentController::class, 'viewCourse']);
 Route::get('/student/profile', [StudentController::class, 'profile']);
 Route::get('/student/course/details/{id}', [StudentController::class, 'courseDetails']);
-Route::post('/student/course/enroll/{id}', [StudentController::class, 'enrollCourse']);
+Route::get('/student/course/enroll/{id}', [StudentController::class, 'enrollCourse']);
 
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
