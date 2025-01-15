@@ -89,7 +89,7 @@
                             </div>
                         </div>
                         <?php if($isEnrolled): ?>
-                            <a href="/student/course/<?php echo $course['id']; ?>/chapter/<?php echo $chapter['id']; ?>" 
+                            <a href="/student/course/<?php echo $course['id']; ?>" 
                                class="text-violet-600 hover:text-violet-700">
                                 <i class="fas fa-play-circle"></i>
                             </a>

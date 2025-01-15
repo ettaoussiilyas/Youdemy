@@ -55,10 +55,15 @@ class Chapter extends Db {
     }
 
     public function getChapterContent($chapterId) {
-        $sql = "SELECT * FROM chapter_content WHERE chapter_id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$chapterId]);
-        return $stmt->fetchAll();
+        try {
+            $sql = "SELECT * FROM chapter_content WHERE chapter_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$chapterId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting chapter content: " . $e->getMessage());
+            return null;
+        }
     }
 
     public function getChapterById($id) {
@@ -237,6 +242,40 @@ class Chapter extends Db {
             return array_values($chapters);
         } catch (PDOException $e) {
             return [];
+        }
+    }
+
+    public function getCourseWithChapters($courseId) {
+        try {
+            // Récupérer les informations du cours
+            $sql = "SELECT c.*, u.name as teacher_name 
+                    FROM courses c 
+                    LEFT JOIN users u ON c.teacher_id = u.id 
+                    WHERE c.id = ?";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$courseId]);
+            $course = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$course) {
+                return null;
+            }
+
+            // Récupérer les chapitres du cours
+            $sql = "SELECT ch.*, cc.type as content_type, cc.file_path, cc.original_name 
+                    FROM chapters ch 
+                    LEFT JOIN chapter_content cc ON ch.id = cc.chapter_id 
+                    WHERE ch.course_id = ? 
+                    ORDER BY ch.id ASC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$courseId]);
+            $course['chapters'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $course;
+        } catch (PDOException $e) {
+            error_log("Error getting course with chapters: " . $e->getMessage());
+            return null;
         }
     }
 } 

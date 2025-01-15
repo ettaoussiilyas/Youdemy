@@ -6,11 +6,13 @@ class StudentController extends BaseController {
     private $courseModel;
     private $enrollmentModel;
     private $userModel;
+    private $chapterModel;
 
     public function __construct() {
         $this->courseModel = new Course();
         $this->enrollmentModel = new Enrollment();
         $this->userModel = new User();
+        $this->chapterModel = new Chapter();
     }
 
     public function dashboard() {
@@ -49,14 +51,28 @@ class StudentController extends BaseController {
             exit;
         }
 
-        // Récupérer les informations du cours et ses chapitres
-        $course = $this->courseModel->getCourseWithChapters($courseId);
-        $progress = $this->enrollmentModel->getStudentProgress($studentId, $courseId);
-        
-        $this->renderStudent('course/view', [
-            'course' => $course,
-            'progress' => $progress
-        ]);
+        try {
+            // Récupérer le cours avec ses chapitres et contenus
+            $course = $this->courseModel->getCourseWithChapters($courseId);
+            
+            // Pour chaque chapitre, récupérer son contenu
+            foreach ($course['chapters'] as &$chapter) {
+                $content = $this->chapterModel->getChapterContent($chapter['id']);
+                if ($content) {
+                    $chapter['content'] = $content;
+                }
+            }
+
+            $this->renderStudent('course/view', [
+                'course' => $course,
+                'activeChapter' => isset($course['chapters'][0]) ? $course['chapters'][0]['id'] : null
+            ]);
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Erreur lors du chargement du cours";
+            header('Location: /student/dashboard');
+            exit;
+        }
     }
 
     public function profile() {
