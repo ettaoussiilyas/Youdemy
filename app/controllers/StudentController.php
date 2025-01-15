@@ -40,8 +40,18 @@ class StudentController extends BaseController {
     }
 
     public function viewCourse($courseId) {
+        $studentId = $_SESSION['user_id'];
+        
+        // Vérifier si l'étudiant est inscrit
+        if (!$this->enrollmentModel->isStudentEnrolled($studentId, $courseId)) {
+            $_SESSION['error'] = "Vous devez être inscrit pour accéder à ce cours";
+            header('Location: /student/course/details/' . $courseId);
+            exit;
+        }
+
+        // Récupérer les informations du cours et ses chapitres
         $course = $this->courseModel->getCourseWithChapters($courseId);
-        $progress = $this->enrollmentModel->getStudentProgress($_SESSION['user_id'], $courseId);
+        $progress = $this->enrollmentModel->getStudentProgress($studentId, $courseId);
         
         $this->renderStudent('course/view', [
             'course' => $course,

@@ -364,26 +364,46 @@
         }
 
         public function getCourseWithChapters($courseId) {
-            $sql = "SELECT 
-                c.*,
-                u.name as teacher_name,
-                (SELECT COUNT(*) FROM chapters WHERE course_id = c.id) as chapter_count,
-                (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count
-            FROM courses c
-            JOIN users u ON c.teacher_id = u.id
-            WHERE c.id = ?";
-            
-            $stmt = $this->conn->prepare($sql);
+            // Récupérer les informations du cours
+            $stmt = $this->conn->prepare("
+                SELECT c.*, u.name as teacher_name,
+                       (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count
+                FROM courses c
+                JOIN users u ON c.teacher_id = u.id
+                WHERE c.id = ?
+            ");
             $stmt->execute([$courseId]);
             $course = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if($course) {
-                $sql = "SELECT * FROM chapters WHERE course_id = ? ORDER BY id";
-                $stmt = $this->conn->prepare($sql);
-                $stmt->execute([$courseId]);
-                $course['chapters'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (!$course) {
+                return null;
             }
-            
+
+            // Récupérer les chapitres avec leur contenu
+            $stmt = $this->conn->prepare("
+                SELECT ch.*, cc.type, cc.file_path, cc.original_name
+                FROM chapters ch
+                LEFT JOIN chapter_content cc ON ch.id = cc.chapter_id
+                WHERE ch.course_id = ?
+                ORDER BY ch.id ASC
+            ");
+            $stmt->execute([$courseId]);
+            $chapters = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Organiser les chapitres avec leur contenu
+            $course['chapters'] = array_map(function($chapter) {
+                if ($chapter['type'] !== null) {
+                    $chapter['content'] = [
+                        'type' => $chapter['type'],
+                        'file_path' => $chapter['file_path'],
+                        'original_name' => $chapter['original_name']
+                    ];
+                }
+                // Nettoyer les clés redondantes
+                unset($chapter['type'], $chapter['file_path'], $chapter['original_name']);
+                return $chapter;
+            }, $chapters);
+
             return $course;
         }
 
