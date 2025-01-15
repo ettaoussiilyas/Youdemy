@@ -63,20 +63,35 @@ class StudentController extends BaseController {
     public function courseDetails($courseId) {
         $course = $this->courseModel->getCourseWithChapters($courseId);
         $isEnrolled = $this->enrollmentModel->isStudentEnrolled($_SESSION['user_id'], $courseId);
+        $teacherInfo = $this->userModel->getById($course['teacher_id']);
         
         $this->renderStudent('course/details', [
             'course' => $course,
-            'isEnrolled' => $isEnrolled
+            'isEnrolled' => $isEnrolled,
+            'teacher' => $teacherInfo
         ]);
     }
 
     public function enrollCourse($courseId) {
-        if($this->enrollmentModel->enroll($_SESSION['user_id'], $courseId)) {
-            header('Location: /student/course/' . $courseId);
+        $studentId = $_SESSION['user_id'];
+        
+        // Vérifier si l'étudiant n'est pas déjà inscrit
+        if ($this->enrollmentModel->isStudentEnrolled($studentId, $courseId)) {
+            $_SESSION['error'] = "You are already enrolled in this course";
+            header('Location: /student/course/details/' . $courseId);
             exit;
         }
-        // Handle error
-        header('Location: /student/browse');
+
+        // Tenter l'inscription
+        if ($this->enrollmentModel->enroll($studentId, $courseId)) {
+            $_SESSION['success'] = "You are enrolled in this course";
+            header('Location: /student/course/details/' . $courseId);
+            exit;
+        }
+
+        // En cas d'erreur
+        $_SESSION['error'] = "An error occurred during enrollment";
+        header('Location: /student/course/details/' . $courseId);
         exit;
     }
 }

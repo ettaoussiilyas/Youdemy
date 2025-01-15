@@ -30,4 +30,10 @@
                 return $stmt->execute([$name, $email, $password, $role, 'active']);
             }
         }
+
+        public function getById($userId) {
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$userId]);  
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
     }

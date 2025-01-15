@@ -35,7 +35,8 @@ class Enrollment extends Db {
     public function getStudentStats($studentId) {
         $sql = "SELECT 
                     COUNT(DISTINCT course_id) as total_courses,
-                    AVG(progress) as avg_progress
+                    AVG(progress) as avg_progress,
+                    MAX(last_accessed) as last_activity
                 FROM enrollments
                 WHERE student_id = ?";
                 
@@ -45,16 +46,34 @@ class Enrollment extends Db {
     }
 
     public function isStudentEnrolled($studentId, $courseId) {
-        $sql = "SELECT COUNT(*) FROM enrollments WHERE student_id = ? AND course_id = ?";
-        $stmt = $this->conn->prepare($sql);
+        $stmt = $this->conn->prepare("
+            SELECT COUNT(*) 
+            FROM enrollments 
+            WHERE student_id = ? AND course_id = ?
+        ");
         $stmt->execute([$studentId, $courseId]);
         return $stmt->fetchColumn() > 0;
     }
 
     public function enroll($studentId, $courseId) {
-        $sql = "INSERT INTO enrollments (student_id, course_id, progress, last_accessed) 
-                VALUES (?, ?, 0, NOW())";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([$studentId, $courseId]);
+        try {
+            // Vérifier si le cours existe
+            $courseCheck = $this->conn->prepare("SELECT id FROM courses WHERE id = ?");
+            $courseCheck->execute([$courseId]);
+            if (!$courseCheck->fetch()) {
+                return false;
+            }
+
+            // Insérer l'inscription
+            $stmt = $this->conn->prepare("
+                INSERT INTO enrollments (student_id, course_id, enrollment_date)
+                VALUES (?, ?, NOW())
+            ");
+            
+            return $stmt->execute([$studentId, $courseId]);
+        } catch (PDOException $e) {
+            // Log l'erreur si nécessaire
+            return false;
+        }
     }
 } 
