@@ -16,7 +16,7 @@
                      style="width: <?php echo $progress; ?>%">
                 </div>
             </div>
-            <p class="text-sm text-gray-600 mb-4"><?php echo $progress; ?>% complété</p>
+            <p class="text-sm text-gray-600 mb-4"><?php echo $progress; ?>% completed</p>
         </div>
 
         <!-- Course Content -->
@@ -45,7 +45,7 @@
                                         <div class="relative rounded-lg overflow-hidden bg-gray-100" style="padding-top: 56.25%">
                                             <video class="absolute top-0 left-0 w-full h-full" controls>
                                                 <source src="/<?php echo $chapter['content']['file_path']; ?>" type="video/mp4">
-                                                Votre navigateur ne supporte pas la lecture de vidéos.
+                                                Your browser does not support the video tag.
                                             </video>
                                         </div>
                                     </div>

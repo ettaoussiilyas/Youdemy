@@ -2,12 +2,14 @@
 require_once __DIR__ . '/../models/Course.php';
 require_once __DIR__ . '/../models/Chapter.php';
 require_once __DIR__ . '/../models/Category.php';
+require_once __DIR__ . '/../models/Tag.php';
 require_once __DIR__ . '/../helpers/UploadHelper.php';
 
 class TeacherController extends BaseController {
     private $courseModel;
     private $chapterModel;
     private $categoryModel;
+    private $tagModel;
     private $uploadHelper;
     
     public function __construct() {
@@ -15,6 +17,7 @@ class TeacherController extends BaseController {
         $this->courseModel = new Course();
         $this->chapterModel = new Chapter();
         $this->categoryModel = new Category();
+        $this->tagModel = new Tag();
         $this->uploadHelper = new UploadHelper();
     }
     
@@ -37,90 +40,88 @@ class TeacherController extends BaseController {
     }
 
     public function createCourse() {
-        // Get categories for the dropdown
         $categories = $this->categoryModel->getAll();
-        
-        $this->render('teacher/course/create', [
-            'categories' => $categories
+        $tags = $this->tagModel->getAll();
+
+        $this->renderTeacher('course/create', [
+            'categories' => $categories,
+            'tags' => $tags
         ]);
     }
 
     public function storeCourse() {
-        try {
-            // 1. Save course info
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $courseData = [
                 'title' => $_POST['title'],
                 'description' => $_POST['description'],
+                'teacher_id' => $_SESSION['user_id'],
                 'category_id' => $_POST['category_id'],
-                'teacher_id' => $_SESSION['user_id']
+                'tags' => isset($_POST['tags']) ? $_POST['tags'] : []
             ];
 
             $courseId = $this->courseModel->create($courseData);
-
-            if (!$courseId) {
-                throw new Exception("Erreur lors de la création du cours");
-            }
-
-            // 2. Save chapters and their content
-            if (isset($_POST['chapters']) && is_array($_POST['chapters'])) {
-                foreach ($_POST['chapters'] as $index => $chapter) {
-                    // Create chapter
-                    $chapterData = [
-                        'course_id' => $courseId,
-                        'title' => $chapter['title'],
-                        'description' => $chapter['description']
-                    ];
-
-                    $chapterId = $this->chapterModel->create($chapterData);
-                    
-                    if (!$chapterId) {
-                        throw new Exception("Erreur lors de la création d'un chapitre");
-                    }
-
-                    // Handle file upload
-                    if (isset($_FILES['chapters']['name'][$index]['content'])) {
-                        // Restructure files array for this specific file
-                        $file = [
-                            'name' => $_FILES['chapters']['name'][$index]['content'],
-                            'type' => $_FILES['chapters']['type'][$index]['content'],
-                            'tmp_name' => $_FILES['chapters']['tmp_name'][$index]['content'],
-                            'error' => $_FILES['chapters']['error'][$index]['content'],
-                            'size' => $_FILES['chapters']['size'][$index]['content']
-                        ];
-
-                        // Upload file using helper
-                        $uploadResult = $this->uploadHelper->uploadChapterContent(
-                            $file,
-                            $courseId,
-                            $chapterId,
-                            $chapter['type']
-                        );
-
-                        // Save content info to database
-                        $contentData = [
-                            'chapter_id' => $chapterId,
+            
+            if ($courseId) {
+                // 2. Save chapters and their content
+                if (isset($_POST['chapters']) && is_array($_POST['chapters'])) {
+                    foreach ($_POST['chapters'] as $index => $chapter) {
+                        // Create chapter
+                        $chapterData = [
+                            'course_id' => $courseId,
                             'title' => $chapter['title'],
-                            'type' => $chapter['type'],
-                            'file_path' => $uploadResult['file_path'],
-                            'original_name' => $uploadResult['original_name']
+                            'description' => $chapter['description']
                         ];
 
-                        if (!$this->chapterModel->addContent($contentData)) {
-                            throw new Exception("Erreur lors de l'ajout du contenu");
+                        $chapterId = $this->chapterModel->create($chapterData);
+                        
+                        if (!$chapterId) {
+                            throw new Exception("Erreur lors de la création d'un chapitre");
+                        }
+
+                        // Handle file upload
+                        if (isset($_FILES['chapters']['name'][$index]['content'])) {
+                            // Restructure files array for this specific file
+                            $file = [
+                                'name' => $_FILES['chapters']['name'][$index]['content'],
+                                'type' => $_FILES['chapters']['type'][$index]['content'],
+                                'tmp_name' => $_FILES['chapters']['tmp_name'][$index]['content'],
+                                'error' => $_FILES['chapters']['error'][$index]['content'],
+                                'size' => $_FILES['chapters']['size'][$index]['content']
+                            ];
+
+                            // Upload file using helper
+                            $uploadResult = $this->uploadHelper->uploadChapterContent(
+                                $file,
+                                $courseId,
+                                $chapterId,
+                                $chapter['type']
+                            );
+
+                            // Save content info to database
+                            $contentData = [
+                                'chapter_id' => $chapterId,
+                                'title' => $chapter['title'],
+                                'type' => $chapter['type'],
+                                'file_path' => $uploadResult['file_path'],
+                                'original_name' => $uploadResult['original_name']
+                            ];
+
+                            if (!$this->chapterModel->addContent($contentData)) {
+                                throw new Exception("Erreur lors de l'ajout du contenu");
+                            }
                         }
                     }
                 }
+
+                $_SESSION['success'] = "Cours créé avec succès!";
+                header("Location: /teacher/dashboard");
+                exit;
             }
-
-            $_SESSION['success'] = "Cours créé avec succès!";
-            header("Location: /teacher/dashboard");
-            exit;
-
-        } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
-            header('Location: /teacher/course/create');
-            exit;
         }
+
+        $_SESSION['error'] = "Erreur lors de la création du cours";
+        header('Location: /teacher/course/create');
+        exit;
     }
 
     public function myCourses() {
@@ -182,178 +183,149 @@ class TeacherController extends BaseController {
         }
     }
 
-    public function editCourse() {
-        try {
-            $id = isset($_GET['id']) ? $_GET['id'] : null;
-            
-            if (!$id) {
-                $this->renderTeacher('mycourses', [
-                    'courses' => $this->courseModel->getTeacherCourses($_SESSION['user_id']),
-                    'error' => 'ID du cours non fourni',
-                    'success' => null
-                ]);
-                return;
-            }
-
-            $teacherId = $_SESSION['user_id'];
-            $course = $this->courseModel->getCourseById($id);
-            
-            if (!$course || $course['teacher_id'] != $teacherId) {
-                $this->renderTeacher('mycourses', [
-                    'courses' => $this->courseModel->getTeacherCourses($teacherId),
-                    'error' => 'Cours introuvable ou non autorisé',
-                    'success' => null
-                ]);
-                return;
-            }
-
-            $categories = $this->categoryModel->getAll();
-            $chapters = $this->chapterModel->getCourseChapters($id);
-            
-            $this->renderTeacher('course/edit', [
-                'course' => $course,
-                'categories' => $categories,
-                'chapters' => $chapters,
-                'error' => null
-            ]);
-
-        } catch (Exception $e) {
-            $this->renderTeacher('mycourses', [
-                'courses' => $this->courseModel->getTeacherCourses($_SESSION['user_id']),
-                'error' => $e->getMessage(),
-                'success' => null
-            ]);
+    public function editCourse($courseId = null) {
+        // Vérifier si l'ID est passé dans l'URL
+        if ($courseId === null) {
+            $courseId = isset($_GET['id']) ? $_GET['id'] : null;
         }
+
+        // Vérifier si on a un ID valide
+        if (!$courseId) {
+            $_SESSION['error'] = "ID du cours non spécifié";
+            header('Location: /teacher/mycourses');
+            exit;
+        }
+
+        $course = $this->courseModel->getById($courseId);
+        
+        // Vérifier si le cours existe
+        if (!$course) {
+            $_SESSION['error'] = "Cours non trouvé";
+            header('Location: /teacher/mycourses');
+            exit;
+        }
+
+        $categories = $this->categoryModel->getAll();
+        $chapters = $this->chapterModel->getChaptersByCourseId($courseId);
+        $tags = $this->tagModel->getAll();
+        $courseTags = $this->courseModel->getCourseTags($courseId);
+
+        $this->renderTeacher('course/edit', [
+            'course' => $course,
+            'categories' => $categories,
+            'chapters' => $chapters,
+            'tags' => $tags,
+            'courseTags' => $courseTags
+        ]);
     }
 
     public function updateCourse() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $courseId = $_POST['course_id'];
+            $error = null;
+            $success = null;
+            
+            try {
+                // Mise à jour du cours
+                $courseData = [
+                    'id' => $courseId,
+                    'title' => $_POST['title'],
+                    'description' => $_POST['description'],
+                    'category_id' => $_POST['category_id'],
+                    'tags' => isset($_POST['tags']) ? $_POST['tags'] : []
+                ];
+
+                if (!$this->courseModel->update($courseData)) {
+                    throw new Exception("Erreur lors de la mise à jour du cours");
+                }
+
+                // Mise à jour des tags
+                $this->courseModel->updateTags($courseId, $courseData['tags']);
+
+                // Traitement des nouveaux chapitres
+                if (isset($_POST['new_chapters'])) {
+                    foreach ($_POST['new_chapters'] as $index => $chapterData) {
+                        $chapter = [
+                            'course_id' => $courseId,
+                            'title' => $chapterData['title'],
+                            'description' => $chapterData['description']
+                        ];
+
+                        $chapterId = $this->chapterModel->create($chapter);
+                        
+                        if (!$chapterId) {
+                            throw new Exception("Erreur lors de la création du chapitre");
+                        }
+
+                        // Traitement du fichier si présent
+                        if (isset($_FILES['new_chapters']['name'][$index]['content']) 
+                            && $_FILES['new_chapters']['error'][$index]['content'] === UPLOAD_ERR_OK) {
+                            
+                            if (!$this->handleChapterFileUpload(
+                                $_FILES['new_chapters']['tmp_name'][$index]['content'],
+                                $_FILES['new_chapters']['name'][$index]['content'],
+                                $courseId,
+                                $chapterId,
+                                $chapterData['type']
+                            )) {
+                                throw new Exception("Erreur lors de l'upload du fichier");
+                            }
+                        }
+                    }
+                }
+
+                $success = "Cours mis à jour avec succès";
+                $this->renderTeacher('mycourses', [
+                    'courses' => $this->courseModel->getTeacherCourses($_SESSION['user_id']),
+                    'error' => null,
+                    'success' => $success
+                ]);
+
+            } catch (Exception $e) {
+                $error = $e->getMessage();
+                $course = $this->courseModel->getById($courseId);
+                $categories = $this->categoryModel->getAll();
+                $chapters = $this->chapterModel->getChaptersByCourseId($courseId);
+                $tags = $this->tagModel->getAll();
+                $courseTags = $this->courseModel->getCourseTags($courseId);
+
+                $this->renderTeacher('course/edit', [
+                    'course' => $course,
+                    'categories' => $categories,
+                    'chapters' => $chapters,
+                    'tags' => $tags,
+                    'courseTags' => $courseTags,
+                    'error' => $error,
+                    'success' => null
+                ]);
+            }
+        }
+    }
+
+    private function handleChapterFileUpload($tmpFile, $fileName, $courseId, $chapterId, $fileType) {
         try {
-            // Get course ID from POST data
-            $id = isset($_POST['course_id']) ? $_POST['course_id'] : null;
-            
-            if (!$id) {
-                throw new Exception('Course ID not provided');
+            $uploadDir = 'uploads/courses/' . $courseId . '/chapters/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
             }
 
-            $teacherId = $_SESSION['user_id'];
-            $course = $this->courseModel->getCourseById($id);
-            
-            if (!$course || $course['teacher_id'] != $teacherId) {
-                throw new Exception('Course not found or unauthorized');
+            $newFileName = uniqid() . '_' . $fileName;
+            $filePath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($tmpFile, $filePath)) {
+                $contentData = [
+                    'chapter_id' => $chapterId,
+                    'title' => $fileName,
+                    'type' => $fileType,
+                    'file_path' => $filePath,
+                    'original_name' => $fileName
+                ];
+                return $this->chapterModel->addContent($contentData);
             }
-
-            // 1. Update course info
-            $courseData = [
-                'id' => $id,
-                'title' => $_POST['title'],
-                'description' => $_POST['description'],
-                'category_id' => $_POST['category_id']
-            ];
-
-            if (!$this->courseModel->update($courseData)) {
-                throw new Exception('Error updating course');
-            }
-
-            // 2. Update existing chapters
-            if (isset($_POST['existing_chapters'])) {
-                foreach ($_POST['existing_chapters'] as $chapterId => $chapter) {
-                    $chapterData = [
-                        'id' => $chapterId,
-                        'title' => $chapter['title'],
-                        'description' => $chapter['description']
-                    ];
-
-                    if (!$this->chapterModel->update($chapterData)) {
-                        throw new Exception('Error updating chapter');
-                    }
-
-                    // Handle new content file if uploaded
-                    if (isset($_FILES['existing_chapters']['name'][$chapterId]['content']) &&
-                        $_FILES['existing_chapters']['error'][$chapterId]['content'] === UPLOAD_ERR_OK) {
-                        
-                        $file = [
-                            'name' => $_FILES['existing_chapters']['name'][$chapterId]['content'],
-                            'type' => $_FILES['existing_chapters']['type'][$chapterId]['content'],
-                            'tmp_name' => $_FILES['existing_chapters']['tmp_name'][$chapterId]['content'],
-                            'error' => $_FILES['existing_chapters']['error'][$chapterId]['content'],
-                            'size' => $_FILES['existing_chapters']['size'][$chapterId]['content']
-                        ];
-
-                        $uploadResult = $this->uploadHelper->uploadChapterContent($file, $id, $chapterId);
-                        
-                        $contentData = [
-                            'chapter_id' => $chapterId,
-                            'file_path' => $uploadResult['file_path'],
-                            'original_name' => $uploadResult['original_name']
-                        ];
-
-                        if (!$this->chapterModel->updateContent($contentData)) {
-                            throw new Exception('Error updating chapter content');
-                        }
-                    }
-                }
-            }
-
-            // 3. Add new chapters
-            if (isset($_POST['new_chapters'])) {
-                foreach ($_POST['new_chapters'] as $index => $chapter) {
-                    $chapterData = [
-                        'course_id' => $id,
-                        'title' => $chapter['title'],
-                        'description' => $chapter['description']
-                    ];
-
-                    $chapterId = $this->chapterModel->create($chapterData);
-                    
-                    if (!$chapterId) {
-                        throw new Exception('Error creating new chapter');
-                    }
-
-                    // Handle file upload for new chapter
-                    if (isset($_FILES['new_chapters']['name'][$index]['content'])) {
-                        $file = [
-                            'name' => $_FILES['new_chapters']['name'][$index]['content'],
-                            'type' => $_FILES['new_chapters']['type'][$index]['content'],
-                            'tmp_name' => $_FILES['new_chapters']['tmp_name'][$index]['content'],
-                            'error' => $_FILES['new_chapters']['error'][$index]['content'],
-                            'size' => $_FILES['new_chapters']['size'][$index]['content']
-                        ];
-
-                        $uploadResult = $this->uploadHelper->uploadChapterContent(
-                            $file,
-                            $id,
-                            $chapterId,
-                            $chapter['type']
-                        );
-
-                        $contentData = [
-                            'chapter_id' => $chapterId,
-                            'title' => $chapter['title'],
-                            'type' => $chapter['type'],
-                            'file_path' => $uploadResult['file_path'],
-                            'original_name' => $uploadResult['original_name']
-                        ];
-
-                        if (!$this->chapterModel->addContent($contentData)) {
-                            throw new Exception('Error adding chapter content');
-                        }
-                    }
-                }
-            }
-
-            $this->renderTeacher('mycourses', [
-                'courses' => $this->courseModel->getTeacherCourses($teacherId),
-                'error' => null,
-                'success' => 'Course updated successfully'
-            ]);
-
+            return false;
         } catch (Exception $e) {
-            $this->renderTeacher('course/edit', [
-                'course' => $course,
-                'categories' => $this->categoryModel->getAll(),
-                'chapters' => $this->chapterModel->getCourseChapters($id),
-                'error' => $e->getMessage()
-            ]);
+            error_log($e->getMessage());
+            return false;
         }
     }
 
@@ -381,32 +353,36 @@ class TeacherController extends BaseController {
         }
     }
 
-    public function deleteChapter($chapterId) {
-        try {
-            // Get chapter info
-            $chapter = $this->chapterModel->getById($chapterId);
-            
-            if (!$chapter) {
-                echo json_encode(['success' => false, 'message' => 'Chapter not found']);
-                return;
+    public function deleteChapter() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $chapterId = isset($_POST['chapter_id']) ? $_POST['chapter_id'] : null;
+            $courseId = isset($_POST['course_id']) ? $_POST['course_id'] : null;
+
+            if (!$chapterId) {
+                echo json_encode(['success' => false, 'message' => 'ID du chapitre manquant']);
+                exit;
             }
 
-            // Check if course belongs to teacher
-            $course = $this->courseModel->getCourseById($chapter['course_id']);
-            if ($course['teacher_id'] != $_SESSION['user_id']) {
-                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-                return;
+            try {
+                if ($this->chapterModel->delete($chapterId)) {
+                    echo json_encode(['success' => true, 'message' => 'Chapitre supprimé avec succès']);
+                } else {
+                    throw new Exception("Erreur lors de la suppression du chapitre");
+                }
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
-
-            // Delete chapter
-            if ($this->chapterModel->delete($chapterId)) {
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Error deleting chapter']);
-            }
-
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            exit;
         }
+    }
+
+    public function createCourseForm() {
+        $categories = $this->categoryModel->getAll();
+        $tags = $this->tagModel->getAll();
+
+        $this->renderTeacher('courses/create', [
+            'categories' => $categories,
+            'tags' => $tags
+        ]);
     }
 }

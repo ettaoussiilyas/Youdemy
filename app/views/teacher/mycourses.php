@@ -12,14 +12,14 @@
     <!-- Main Content -->
     <div class="ml-64 flex-1 p-8 pt-20">
         <?php if (isset($error)): ?>
-            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                <?php echo $error; ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline"><?php echo $error; ?></span>
             </div>
         <?php endif; ?>
 
         <?php if (isset($success)): ?>
-            <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                <?php echo $success; ?>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline"><?php echo $success; ?></span>
             </div>
         <?php endif; ?>
 
@@ -53,6 +53,16 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-2"><?php echo $course['title']; ?></h3>
                     <p class="text-gray-600 mb-4 line-clamp-2"><?php echo $course['description']; ?></p>
 
+                    <?php if (!empty($course['tags'])): ?>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <?php foreach($course['tags'] as $tag): ?>
+                            <span class="px-2 py-1 bg-violet-100 text-violet-800 text-xs rounded-full">
+                                <?php echo htmlspecialchars($tag['name']); ?>
+                            </span>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="flex items-center justify-between pt-4 border-t">
                         <div class="flex space-x-2">
                             <a href="/teacher/course/edit?id=<?php echo $course['id']; ?>" 
@@ -66,10 +76,8 @@
                             </button>
                          
                         </div>
-                        <a href="/teacher/course/edit?id=<?php echo $course['id']; ?>" 
-                           class="text-blue-600 hover:text-blue-700 flex items-center">
-                           Manage
-                            <i class="fas fa-arrow-right ml-2"></i>
+                        <a href="/teacher/course/edit?id=<?php echo $course['id']; ?>" class="btn">
+                            Manage
                         </a>
                     </div>
                 </div>

@@ -1,8 +1,14 @@
 <?php
     $categories = $data['categories'];
+    $tags = $data['tags'];
     require_once __DIR__ . '/../../layouts/headerDashboard.php';
     require_once __DIR__ . '/../../layouts/sidebareTeacher.php';
 ?>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6 mt-20">
         <h1 class="text-2xl font-bold mb-6">Créer un nouveau cours</h1>
@@ -36,6 +42,19 @@
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             <?php foreach($categories as $category): ?>
                                 <option value="<?= $category['id'] ?>"><?= $category['name'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Tags
+                        </label>
+                        <select name="tags[]" multiple="multiple" class="tags-select w-full">
+                            <?php foreach($tags as $tag): ?>
+                                <option value="<?php echo $tag['id']; ?>">
+                                    <?php echo $tag['name']; ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -181,5 +200,40 @@ document.addEventListener('change', function(e) {
             fileInput.accept = '.pdf,.doc,.docx';
         }
     }
+});
+
+// Initialisation de Select2 pour les tags
+$(document).ready(function() {
+    $('.tags-select').select2({
+        placeholder: 'Sélectionnez les tags',
+        allowClear: true,
+        width: '100%',
+        theme: 'classic',
+        language: {
+            noResults: function() {
+                return "Aucun tag trouvé";
+            }
+        }
+    });
+
+    // Style personnalisé pour correspondre à votre design
+    $('.select2-container--classic .select2-selection--multiple').css({
+        'border-color': '#E5E7EB',
+        'border-radius': '0.5rem',
+        'min-height': '42px'
+    });
+
+    $('.select2-container--classic .select2-selection--multiple .select2-selection__choice').css({
+        'background-color': '#8B5CF6',
+        'color': 'white',
+        'border': 'none',
+        'border-radius': '0.375rem',
+        'padding': '2px 8px'
+    });
+
+    $('.select2-container--classic .select2-selection--multiple .select2-selection__choice__remove').css({
+        'color': 'white',
+        'margin-right': '5px'
+    });
 });
 </script> 

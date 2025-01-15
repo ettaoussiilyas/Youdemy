@@ -53,7 +53,8 @@ Route::get('/teacher/mycourses', [TeacherController::class, 'myCourses']);
 Route::get('/teacher/course/delete', [TeacherController::class, 'deleteCourse']);
 Route::get('/teacher/course/edit', [TeacherController::class, 'editCourse']);
 Route::post('/teacher/course/update', [TeacherController::class, 'updateCourse']);
-Route::post('/teacher/chapter/delete/{id}', [TeacherController::class, 'deleteChapter']);
+// Route::post('/teacher/chapter/delete/{id}', [TeacherController::class, 'deleteChapter']);
+Route::post('/teacher/chapter/delete', [TeacherController::class, 'deleteChapter']);
 Route::get('/teacher/stats', [TeacherController::class, 'showStats']);
 
 // Student Routes
@@ -67,3 +68,5 @@ Route::get('/student/course/enroll/{id}', [StudentController::class, 'enrollCour
 
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+
+// Dans la section des routes

@@ -198,16 +198,36 @@
         }
 
         public function getTeacherCourses($teacherId) {
-            $sql = "SELECT c.*, cat.name as category_name, 
-                    (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as student_count 
-                    FROM courses c 
-                    LEFT JOIN categories cat ON c.category_id = cat.id 
+            try {
+                $stmt = $this->conn->prepare("
+                    SELECT c.*, cat.name as category_name,
+                           COUNT(DISTINCT e.id) as student_count
+                    FROM courses c
+                    LEFT JOIN categories cat ON c.category_id = cat.id
+                    LEFT JOIN enrollments e ON c.id = e.course_id
                     WHERE c.teacher_id = ?
-                    ORDER BY c.created_at DESC";
-            
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$teacherId]);
-            return $stmt->fetchAll();
+                    GROUP BY c.id
+                ");
+                
+                $stmt->execute([$teacherId]);
+                $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Récupérer les tags pour chaque cours
+                foreach ($courses as &$course) {
+                    $stmt = $this->conn->prepare("
+                        SELECT t.* 
+                        FROM tags t
+                        JOIN course_tags ct ON t.id = ct.tag_id
+                        WHERE ct.course_id = ?
+                    ");
+                    $stmt->execute([$course['id']]);
+                    $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                return $courses;
+            } catch (PDOException $e) {
+                return [];
+            }
         }
 
         public function deleteCourse($courseId) {
@@ -269,31 +289,27 @@
             try {
                 $this->conn->beginTransaction();
 
-                // Update course basic info
-                $sql = "UPDATE courses 
-                        SET title = :title, 
-                            description = :description, 
-                            category_id = :category_id 
-                        WHERE id = :id";
-                
-                $stmt = $this->conn->prepare($sql);
+                $stmt = $this->conn->prepare("
+                    UPDATE courses 
+                    SET title = ?, description = ?, category_id = ?
+                    WHERE id = ?
+                ");
+
                 $result = $stmt->execute([
-                    ':title' => $data['title'],
-                    ':description' => $data['description'],
-                    ':category_id' => $data['category_id'],
-                    ':id' => $data['id']
+                    $data['title'],
+                    $data['description'],
+                    $data['category_id'],
+                    $data['id']
                 ]);
 
-                if (!$result) {
-                    throw new Exception("Error updating course");
+                if ($result && isset($data['tags'])) {
+                    $this->updateTags($data['id'], $data['tags']);
                 }
 
                 $this->conn->commit();
                 return true;
-
-            } catch (Exception $e) {
+            } catch (PDOException $e) {
                 $this->conn->rollBack();
-                error_log("Error updating course: " . $e->getMessage());
                 return false;
             }
         }
@@ -364,46 +380,26 @@
         }
 
         public function getCourseWithChapters($courseId) {
-            // Récupérer les informations du cours
-            $stmt = $this->conn->prepare("
-                SELECT c.*, u.name as teacher_name,
-                       (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count
-                FROM courses c
-                JOIN users u ON c.teacher_id = u.id
-                WHERE c.id = ?
-            ");
+            $sql = "SELECT 
+                c.*,
+                u.name as teacher_name,
+                (SELECT COUNT(*) FROM chapters WHERE course_id = c.id) as chapter_count,
+                (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count
+            FROM courses c
+            JOIN users u ON c.teacher_id = u.id
+            WHERE c.id = ?";
+            
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute([$courseId]);
             $course = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$course) {
-                return null;
+            
+            if($course) {
+                $sql = "SELECT * FROM chapters WHERE course_id = ? ORDER BY id";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+                $course['chapters'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
-
-            // Récupérer les chapitres avec leur contenu
-            $stmt = $this->conn->prepare("
-                SELECT ch.*, cc.type, cc.file_path, cc.original_name
-                FROM chapters ch
-                LEFT JOIN chapter_content cc ON ch.id = cc.chapter_id
-                WHERE ch.course_id = ?
-                ORDER BY ch.id ASC
-            ");
-            $stmt->execute([$courseId]);
-            $chapters = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Organiser les chapitres avec leur contenu
-            $course['chapters'] = array_map(function($chapter) {
-                if ($chapter['type'] !== null) {
-                    $chapter['content'] = [
-                        'type' => $chapter['type'],
-                        'file_path' => $chapter['file_path'],
-                        'original_name' => $chapter['original_name']
-                    ];
-                }
-                // Nettoyer les clés redondantes
-                unset($chapter['type'], $chapter['file_path'], $chapter['original_name']);
-                return $chapter;
-            }, $chapters);
-
+            
             return $course;
         }
 
@@ -422,6 +418,72 @@
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$_SESSION['user_id']]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function getCourseTags($courseId) {
+            $stmt = $this->conn->prepare("
+                SELECT tag_id 
+                FROM course_tags 
+                WHERE course_id = ?
+            ");
+            $stmt->execute([$courseId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function updateTags($courseId, $tagIds) {
+            try {
+                // Supprimer les anciens tags
+                $stmt = $this->conn->prepare("DELETE FROM course_tags WHERE course_id = ?");
+                $stmt->execute([$courseId]);
+
+                // Ajouter les nouveaux tags
+                if (!empty($tagIds)) {
+                    $stmt = $this->conn->prepare("
+                        INSERT INTO course_tags (course_id, tag_id)
+                        VALUES (?, ?)
+                    ");
+
+                    foreach ($tagIds as $tagId) {
+                        $stmt->execute([$courseId, $tagId]);
+                    }
+                }
+
+                return true;
+            } catch (PDOException $e) {
+                return false;
+            }
+        }
+
+        public function getById($courseId) {
+            try {
+                $stmt = $this->conn->prepare("
+                    SELECT c.*, u.name as teacher_name,
+                           cat.name as category_name
+                    FROM courses c
+                    JOIN users u ON c.teacher_id = u.id
+                    JOIN categories cat ON c.category_id = cat.id
+                    WHERE c.id = ?
+                ");
+                
+                $stmt->execute([$courseId]);
+                $course = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($course) {
+                    // Récupérer les tags du cours
+                    $stmt = $this->conn->prepare("
+                        SELECT t.* 
+                        FROM tags t
+                        JOIN course_tags ct ON t.id = ct.tag_id
+                        WHERE ct.course_id = ?
+                    ");
+                    $stmt->execute([$courseId]);
+                    $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                return $course;
+            } catch (PDOException $e) {
+                return false;
+            }
         }
 
     }
