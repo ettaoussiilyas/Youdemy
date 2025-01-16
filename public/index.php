@@ -89,10 +89,11 @@ Route::get('/admin/statistics', [AdminController::class, 'stats']);
 
 // API Routes (زيد هاد السطر قبل dispatch)
 Route::get('/api/courses/filter', [CourseController::class, 'filterCourses']);
-
+//Route to browse courses
+Route::get('/courses', [CourseController::class, 'browseCourses']);
+// Dans la section des routes
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 
-// Dans la section des routes
-
 Route::get('/api/courses/filter', [CourseController::class, 'filter']);
+

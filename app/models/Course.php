@@ -436,7 +436,7 @@
                 $stmt = $this->conn->prepare("DELETE FROM course_tags WHERE course_id = ?");
                 $stmt->execute([$courseId]);
 
-                // Ajouter les nouveaux tags
+                //add new tags
                 if (!empty($tagIds)) {
                     $stmt = $this->conn->prepare("
                         INSERT INTO course_tags (course_id, tag_id)
@@ -469,7 +469,7 @@
                 $course = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($course) {
-                    // Récupérer les tags du cours
+                    //get tags for the course
                     $stmt = $this->conn->prepare("
                         SELECT t.* 
                         FROM tags t
@@ -488,7 +488,7 @@
 
         public function getTotalCourses() {
             try {
-                // Version simplifiée sans condition de status
+                // simplified query without status condition
                 $sql = "SELECT COUNT(*) as total FROM courses";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute();

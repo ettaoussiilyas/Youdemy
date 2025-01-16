@@ -5,9 +5,14 @@
     class CourseController extends BaseController {
 
         private $courseModel;
+        private $categoryModel;
+        private $tagModel;
 
         public function __construct(){
+            parent::__construct();
             $this->courseModel = new Course();
+            $this->categoryModel = new Category();
+            $this->tagModel = new Tag();
         }
 
         public function getAllCourses(){
@@ -74,6 +79,28 @@
             // Return JSON response
             header('Content-Type: application/json');
             echo json_encode($courses);
+        }
+
+        public function browseCourses() {
+            try {
+                // جلب جميع الكورسات
+                $courses = $this->courseModel->getAllCourses();
+                
+                // جلب التصنيفات والتاگز للفلترة
+                $categories = $this->categoryModel->getAll();
+                $tags = $this->tagModel->getAll();
+                
+                // عرض الصفحة
+                $this->render('course/browse', [
+                    'courses' => $courses,
+                    'categories' => $categories,
+                    'tags' => $tags
+                ]);
+            } catch (Exception $e) {
+                $_SESSION['error'] = "Une erreur s'est produite.";
+                header('Location: /home');
+                exit;
+            }
         }
         
 
