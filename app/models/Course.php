@@ -555,6 +555,38 @@
             }
         }
 
+        public function getPopularCourses() {
+            try {
+                $sql = "SELECT c.*, cat.name as category_name, u.name as teacher_name,
+                       (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as student_count
+                FROM courses c
+                LEFT JOIN categories cat ON c.category_id = cat.id
+                LEFT JOIN users u ON c.teacher_id = u.id
+                WHERE c.status = 'active'
+                ORDER BY student_count DESC";
+                
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute();
+                $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Charger les tags pour chaque cours
+                foreach ($courses as &$course) {
+                    $sql = "SELECT t.* 
+                           FROM tags t 
+                           JOIN course_tags ct ON t.id = ct.tag_id 
+                           WHERE ct.course_id = ?";
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute([$course['id']]);
+                    $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                return $courses;
+            } catch (PDOException $e) {
+                error_log("Error fetching popular courses: " . $e->getMessage());
+                return [];
+            }
+        }
+
     }
 
 ?>

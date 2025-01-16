@@ -90,3 +90,5 @@ Route::get('/admin/statistics', [AdminController::class, 'stats']);
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 
 // Dans la section des routes
+
+Route::get('/api/courses/filter', [CourseController::class, 'filter']);
