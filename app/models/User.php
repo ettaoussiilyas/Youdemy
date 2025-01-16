@@ -72,4 +72,18 @@ class User extends Db {
             return 0;
         }
     }
+
+    public function getUserByEmail($email) {
+        $sql = "SELECT * FROM users WHERE email = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getById($id) {
+        $sql = "SELECT * FROM users WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

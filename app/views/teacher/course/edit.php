@@ -184,7 +184,7 @@
             </div>
 
             <div class="flex justify-end gap-4 pt-6 border-t">
-                <a href="/teacher/courses" 
+                <a href="/teacher/mycourses" 
                    class="px-6 py-2 text-gray-600 hover:text-gray-800 transition">
                     Cancel
                 </a>

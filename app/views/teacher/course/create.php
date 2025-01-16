@@ -11,16 +11,16 @@
 
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6 mt-20">
-        <h1 class="text-2xl font-bold mb-6">Créer un nouveau cours</h1>
+        <h1 class="text-2xl font-bold mb-6">Create a new course</h1>
 
         <form action="/teacher/course/store" method="POST" enctype="multipart/form-data" class="space-y-6">
             <!-- Course Details -->
             <div class="border-b pb-6">
-                <h2 class="text-lg font-semibold mb-4">Informations du cours</h2>
+                <h2 class="text-lg font-semibold mb-4">Course informations</h2>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Titre du cours
+                            Course title
                         </label>
                         <input type="text" name="title" required 
                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
@@ -36,7 +36,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Catégorie
+                            Category
                         </label>
                         <select name="category_id" required 
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md">
@@ -63,14 +63,14 @@
 
             <!-- Chapters Section -->
             <div class="space-y-4">
-                <h2 class="text-lg font-semibold">Chapitres du cours</h2>
+                <h2 class="text-lg font-semibold">Course chapters</h2>
                 <div id="chapters-container" class="space-y-6">
                     <!-- Template for a chapter -->
                     <div class="chapter-item border rounded-md p-4">
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Titre du chapitre
+                                    Chapter title
                                 </label>
                                 <input type="text" name="chapters[0][title]" required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
@@ -87,24 +87,24 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                                        Type de contenu
+                                        Content type
                                     </label>
                                     <select name="chapters[0][type]" required
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
-                                        <option value="video">Vidéo</option>
+                                        <option value="video">Video</option>
                                         <option value="document">Document</option>
                                     </select>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                                        Fichier
+                                        File
                                     </label>
                                     <input type="file" name="chapters[0][content]" required
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
                                            accept=".mp4,.webm,.pdf,.doc,.docx">
                                     <p class="mt-1 text-xs text-gray-500">
-                                        Vidéos: MP4, WEBM (max 100MB)<br>
+                                        Videos: MP4, WEBM (max 100MB)<br>
                                         Documents: PDF, DOC, DOCX
                                     </p>
                                 </div>
@@ -116,18 +116,18 @@
                 <button type="button" id="add-chapter" 
                         class="text-blue-600 hover:text-blue-700 flex items-center">
                     <i class="fas fa-plus-circle mr-2"></i>
-                    Ajouter un chapitre
+                    Add a chapter
                 </button>
             </div>
 
             <div class="flex justify-end gap-4 pt-6">
                 <a href="/teacher/dashboard" 
                    class="px-4 py-2 text-gray-600 hover:text-gray-800">
-                    Annuler
+                    Cancel
                 </a>
                 <button type="submit" 
                         class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                    Créer le cours
+                    Create
                 </button>
             </div>
         </form>

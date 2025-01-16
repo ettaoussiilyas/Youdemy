@@ -67,4 +67,11 @@ class Category extends Db {
             return [];
         }
     }
+
+    public function getAll() {
+        $sql = "SELECT * FROM categories ORDER BY name";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

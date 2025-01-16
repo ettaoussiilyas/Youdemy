@@ -71,4 +71,11 @@ class Tag extends Db {
             return [];
         }
     }
+
+    public function getAll() {
+        $sql = "SELECT * FROM tags ORDER BY name";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 } 
