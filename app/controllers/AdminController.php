@@ -130,5 +130,128 @@ class AdminController extends BaseController{
             header('Location: /admin/users?error=status_update_failed');
         }
     }
+
+    public function content() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $courseModel = new Course();
+            $courses = $courseModel->getAllCourses();
+
+            $this->render('admin/content', [
+                'courses' => $courses
+            ]);
+        } catch (Exception $e) {
+            error_log("Error loading courses: " . $e->getMessage());
+            $this->render('admin/content', [
+                'courses' => [],
+                'error' => 'Failed to load courses'
+            ]);
+        }
+    }
+
+    public function deleteCourse($courseId) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $courseModel = new Course();
+            $courseModel->deleteCourse($courseId);
+            header('Location: /admin/content');
+        } catch (Exception $e) {
+            error_log("Error deleting course: " . $e->getMessage());
+            header('Location: /admin/content?error=delete_failed');
+        }
+    }
+
+    public function categories() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $categories = $this->categoryModel->getAllCategories();
+            $tags = $this->tagModel->getAllTags();
+
+            $this->render('admin/categories', [
+                'categories' => $categories,
+                'tags' => $tags
+            ]);
+        } catch (Exception $e) {
+            $this->render('admin/categories', [
+                'categories' => [],
+                'tags' => [],
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function addCategory() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
+            try {
+                $name = $_POST['name'];
+                $description = $_POST['description'] ?? '';
+                $this->categoryModel->addCategory($name, $description);
+                header('Location: /admin/categories');
+            } catch (Exception $e) {
+                header('Location: /admin/categories?error=add_failed');
+            }
+        }
+    }
+
+    public function deleteCategory($categoryId) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $this->categoryModel->deleteCategory($categoryId);
+            header('Location: /admin/categories');
+        } catch (Exception $e) {
+            header('Location: /admin/categories?error=delete_failed');
+        }
+    }
+
+    public function addTag() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
+            try {
+                $this->tagModel->addTag($_POST['name']);
+                header('Location: /admin/categories');
+            } catch (Exception $e) {
+                header('Location: /admin/categories?error=add_failed');
+            }
+        }
+    }
+
+    public function deleteTag($tagId) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $this->tagModel->deleteTag($tagId);
+            header('Location: /admin/categories');
+        } catch (Exception $e) {
+            header('Location: /admin/categories?error=delete_failed');
+        }
+    }
 }
 

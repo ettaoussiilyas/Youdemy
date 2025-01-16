@@ -74,6 +74,17 @@ Route::get('/admin/users', [AdminController::class, 'users']);
 Route::get('/admin/users/updateStatus/{id}/{status}', [AdminController::class, 'updateUserStatus']);
 Route::get('/admin/users/delete/{id}', [AdminController::class, 'deleteUser']);
 
+// Content Management Routes
+Route::get('/admin/content', [AdminController::class, 'content']);
+Route::get('/admin/content/delete/{id}', [AdminController::class, 'deleteCourse']);
+
+// Categories & Tags Routes
+Route::get('/admin/categories', [AdminController::class, 'categories']);
+Route::post('/admin/categories/add', [AdminController::class, 'addCategory']);
+Route::get('/admin/categories/delete/{id}', [AdminController::class, 'deleteCategory']);
+Route::post('/admin/tags/add', [AdminController::class, 'addTag']);
+Route::get('/admin/tags/delete/{id}', [AdminController::class, 'deleteTag']);
+
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 

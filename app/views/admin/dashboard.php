@@ -124,7 +124,7 @@
                                         class="px-3 py-1 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors">
                                     <i class="fas fa-check mr-1"></i> Approve
                                 </button>
-                                <button onclick="rejectTeacher(<?php echo $teacher['id']; ?>)"
+                                <button onclick="deleteUser(<?php echo $user['id']; ?>)"
                                         class="px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
                                     <i class="fas fa-times mr-1"></i> Reject
                                 </button>
@@ -179,14 +179,14 @@
 
 <script>
 function approveTeacher(teacherId) {
-    if(confirm('Are you sure you want to approve this teacher?')) {
-        window.location.href = `/admin/users/teachers/approve/${teacherId}`;
-    }
+        window.location.href = '/admin/users';
+   
 }
 
-function rejectTeacher(teacherId) {
-    if(confirm('Are you sure you want to reject this teacher?')) {
-        window.location.href = `/admin/users/teachers/reject/${teacherId}`;
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        console.log(`Deleting user ${userId}`);
+        window.location.href = `/admin/users/delete/${userId}`;
     }
 }
 </script>
