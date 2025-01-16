@@ -1,39 +1,44 @@
 <?php
 
+require_once __DIR__ . '/../config/db.php';
 
-    class User extends Db{
+class User extends Db {
 
-        public function __construct(){
-            parent::__construct();
-        }
+    public function __construct() {
+        parent::__construct();
+    }
 
-        public function getUserByEmail($email){
-            $sql = "SELECT * FROM users WHERE email = ?";
+    public function getAllUsers() {
+        try {
+            $sql = "SELECT id, name, email, role, status FROM users";
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$email]);
-            return $stmt->fetch();
-        }
-
-        public function getStatus($id){
-            $sql = "SELECT status FROM users WHERE id = ?";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$id]);
-            return $stmt->fetch();
-        }
-
-        public function createUser($name, $email, $password, $role){
-            $sql = "INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $this->conn->prepare($sql);
-            if($role === 'teacher'){
-                return $stmt->execute([$name, $email, $password, $role, 'review']);
-            }else{
-                return $stmt->execute([$name, $email, $password, $role, 'active']);
-            }
-        }
-
-        public function getById($userId) {
-            $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = ?");
-            $stmt->execute([$userId]);  
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error fetching users: " . $e->getMessage());
+            return [];
         }
     }
+
+    public function deleteUser($userId) {
+        try {
+            $sql = "DELETE FROM users WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$userId]);
+        } catch (PDOException $e) {
+            error_log("Error deleting user: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateUserStatus($userId, $newStatus) {
+        try {
+            $sql = "UPDATE users SET status = ? WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$newStatus, $userId]);
+        } catch (PDOException $e) {
+            error_log("Error updating user status: " . $e->getMessage());
+            return false;
+        }
+    }
+}

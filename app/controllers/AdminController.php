@@ -4,6 +4,7 @@ require_once __DIR__ . '/../models/Course.php';
 require_once __DIR__ . '/../models/Chapter.php';
 require_once __DIR__ . '/../models/Category.php';
 require_once __DIR__ . '/../models/Tag.php';
+require_once __DIR__ . '/../models/User.php';
 
 class AdminController extends BaseController{
 
@@ -66,6 +67,67 @@ class AdminController extends BaseController{
                 'lastCourses' => [],
                 'errors' => $e->getMessage()
             ]);
+        }
+    }
+
+    public function users() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $userModel = new User();
+            $users = $userModel->getAllUsers();
+
+            $this->render('admin/users', [
+                'users' => $users
+            ]);
+        } catch (Exception $e) {
+            $this->render('admin/users', [
+                'users' => [],
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function deleteUser($userId) {
+        error_log("deleteUser called with userId=$userId");
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            error_log("Access denied: not admin");
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $userModel = new User();
+            $result = $userModel->deleteUser($userId);
+            error_log("Delete user result: " . ($result ? "success" : "failed"));
+            header('Location: /admin/users');
+        } catch (Exception $e) {
+            error_log("Error deleting user: " . $e->getMessage());
+            header('Location: /admin/users?error=delete_failed');
+        }
+    }
+
+    public function updateUserStatus($userId, $newStatus) {
+        error_log("updateUserStatus called with userId=$userId, newStatus=$newStatus");
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            error_log("Access denied: not admin");
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $userModel = new User();
+            $result = $userModel->updateUserStatus($userId, $newStatus);
+            error_log("Update status result: " . ($result ? "success" : "failed"));
+            header('Location: /admin/users');
+        } catch (Exception $e) {
+            error_log("Error updating user status: " . $e->getMessage());
+            header('Location: /admin/users?error=status_update_failed');
         }
     }
 }

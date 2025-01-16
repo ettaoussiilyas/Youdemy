@@ -68,9 +68,11 @@ Route::get('/student/profile', [StudentController::class, 'profile']);
 Route::get('/student/course/details/{id}', [StudentController::class, 'courseDetails']);
 Route::get('/student/course/enroll/{id}', [StudentController::class, 'enrollCourse']);
 
-
 // Admin Routes
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+Route::get('/admin/users', [AdminController::class, 'users']);
+Route::get('/admin/users/updateStatus/{id}/{status}', [AdminController::class, 'updateUserStatus']);
+Route::get('/admin/users/delete/{id}', [AdminController::class, 'deleteUser']);
 
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
