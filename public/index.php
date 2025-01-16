@@ -14,6 +14,8 @@ require_once '../app/controllers/CourseController.php';
 require_once '../app/controllers/ChapterController.php';
 require_once '../app/controllers/TeacherController.php';
 require_once '../app/controllers/StudentController.php';
+require_once '../app/controllers/AdminController.php';
+
 session_start();
 
 $router = new Router();
@@ -65,6 +67,10 @@ Route::get('/student/course/{id}', [StudentController::class, 'viewCourse']);
 Route::get('/student/profile', [StudentController::class, 'profile']);
 Route::get('/student/course/details/{id}', [StudentController::class, 'courseDetails']);
 Route::get('/student/course/enroll/{id}', [StudentController::class, 'enrollCourse']);
+
+
+// Admin Routes
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

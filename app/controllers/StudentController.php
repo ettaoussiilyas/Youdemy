@@ -16,6 +16,9 @@ class StudentController extends BaseController {
     }
 
     public function dashboard() {
+        if(!isset($_SESSION['user_id'])){
+            return $this->render('auth/login', ['errors' => 'You must be logged in to access this page']);
+        }
         $studentId = $_SESSION['user_id'];
         $enrolledCourses = $this->enrollmentModel->getStudentCourses($studentId);
         

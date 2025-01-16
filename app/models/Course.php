@@ -486,6 +486,49 @@
             }
         }
 
+        public function getTotalCourses() {
+            try {
+                // Version simplifiée sans condition de status
+                $sql = "SELECT COUNT(*) as total FROM courses";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $result['total'];
+            } catch (PDOException $e) {
+                return 0;
+            }
+        }
+
+        public function getLastCourses() {
+            try {
+                // Requête simple pour debug
+                $sql = "SELECT * FROM courses ORDER BY id DESC LIMIT 5";
+                
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute();
+                
+                // Debug: Afficher le nombre de résultats
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                error_log("Number of courses found: " . count($results));
+                
+                if(empty($results)) {
+                    error_log("No courses found in database");
+                } else {
+                    error_log("First course data: " . print_r($results[0], true));
+                }
+                
+                return $results;
+            } catch (PDOException $e) {
+                error_log("Database error: " . $e->getMessage());
+                return [];
+            }
+            
+            
+        }
+
+
+
+
     }
 
 ?>

@@ -82,7 +82,7 @@
                 // Redirect based on role
                 switch ($user['role']) {
                     case 'admin':
-                        header('Location: /admin');
+                        header('Location: /admin/dashboard');
                         break;
                     case 'student':
                         header('Location: /student/dashboard');

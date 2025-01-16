@@ -22,6 +22,9 @@ class TeacherController extends BaseController {
     }
     
     public function dashboard() {
+        if(!isset($_SESSION['user_id'])){
+            return $this->render('auth/login', ['errors' => 'You must be logged in to access this page']);
+        }
         // Get teacher ID from session
         $teacherId = $_SESSION['user_id'];
         
