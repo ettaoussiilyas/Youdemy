@@ -501,13 +501,13 @@
 
         public function getLastCourses() {
             try {
-                // Requête simple pour debug
+                // simple query to debug
                 $sql = "SELECT * FROM courses ORDER BY id DESC LIMIT 5";
                 
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute();
                 
-                // Debug: Afficher le nombre de résultats
+                // Debug: Display the number of results
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 error_log("Number of courses found: " . count($results));
                 
@@ -572,7 +572,7 @@
                 $stmt->execute();
                 $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // جلب التاگز لكل كورس
+                //get tags for each course
                 foreach ($courses as &$course) {
                     $stmt = $this->conn->prepare("
                         SELECT t.* 

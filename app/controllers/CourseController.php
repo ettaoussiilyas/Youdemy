@@ -16,32 +16,36 @@
         }
 
         public function getCourseById($id) {
-            if (!$id) {
-                header('Location: /courses');
+            try {
+                // جلب معلومات الكورس
+                $course = $this->courseModel->getCourseWithDetails($id);
+                
+                if (!$course) {
+                    header('Location: /home');
+                    exit;
+                }
+                
+                // جلب الفصول مع المحتوى
+                $chapters = $this->courseModel->getCourseChaptersWithContent($id);
+                
+                // التحقق من تسجيل الطالب (إذا كان مسجل)
+                $isEnrolled = false;
+                if (isset($_SESSION['user_id'])) {
+                    $isEnrolled = $this->courseModel->isStudentEnrolled($_SESSION['user_id'], $id);
+                }
+                
+                // عرض صفحة تفاصيل الكورس
+                $this->render('course/details', [
+                    'course' => $course,
+                    'chapters' => $chapters,
+                    'isEnrolled' => $isEnrolled
+                ]);
+                
+            } catch (Exception $e) {
+                $_SESSION['error'] = "Une erreur s'est produite.";
+                header('Location: /home');
                 exit;
             }
-            
-            // Get course details with chapters
-            $course = $this->courseModel->getCourseWithDetails($id);
-            if (!$course) {
-                header('Location: /courses');
-                exit;
-            }
-            
-            // Get chapters with their content
-            $chapters = $this->courseModel->getCourseChaptersWithContent($id);
-            
-            // Check enrollment
-            $isEnrolled = false;
-            if (isset($_SESSION['user_id'])) {
-                $isEnrolled = $this->courseModel->isStudentEnrolled($_SESSION['user_id'], $id);
-            }
-            
-            $this->render('components/courseView', [
-                'course' => $course,
-                'chapters' => $chapters,
-                'isEnrolled' => $isEnrolled
-            ]);
         }
 
         public function getCourseByCategory($category){
