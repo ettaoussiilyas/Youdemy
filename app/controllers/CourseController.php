@@ -59,6 +59,18 @@
             $courses = $this->courseModel->getAllCourses();
             $this->render('Home', ['courses' => $courses]);
         }
+
+        public function filterCourses() {
+            $search = $_GET['search'] ?? '';
+            $category = $_GET['category'] ?? '';
+            $tag = $_GET['tag'] ?? '';
+            
+            $courses = $this->courseModel->searchCourses($search, $category, $tag);
+            
+            // Return JSON response
+            header('Content-Type: application/json');
+            echo json_encode($courses);
+        }
         
 
 

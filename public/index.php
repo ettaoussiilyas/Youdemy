@@ -15,6 +15,7 @@ require_once '../app/controllers/ChapterController.php';
 require_once '../app/controllers/TeacherController.php';
 require_once '../app/controllers/StudentController.php';
 require_once '../app/controllers/AdminController.php';
+require_once '../app/controllers/HomeController.php';
 
 session_start();
 
@@ -24,8 +25,8 @@ Route::setRouter($router);
 
 
 // Auth Routes
-Route::get('/', [CourseController::class, 'showHome']);
-Route::get('/home', [CourseController::class, 'showHome']);
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/home', [HomeController::class, 'index']);
 Route::get('/login', [AuthController::class, 'showLogin']);
 Route::get('/signup', [AuthController::class, 'showSignup']); 
 Route::post('/login', [AuthController::class, 'loginChecker']);
@@ -85,6 +86,9 @@ Route::get('/admin/categories/delete/{id}', [AdminController::class, 'deleteCate
 Route::post('/admin/tags/add', [AdminController::class, 'addTag']);
 Route::get('/admin/tags/delete/{id}', [AdminController::class, 'deleteTag']);
 Route::get('/admin/statistics', [AdminController::class, 'stats']);
+
+// API Routes (زيد هاد السطر قبل dispatch)
+Route::get('/api/courses/filter', [CourseController::class, 'filterCourses']);
 
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

@@ -158,10 +158,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedCategory = categoryFilter.value;
         const selectedTag = tagFilter.value;
 
-        fetch(`/api/courses/filter?search=${searchTerm}&category=${selectedCategory}&tag=${selectedTag}`)
+        fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}`)
             .then(response => response.json())
             .then(data => {
-                // Mettre à jour l'affichage des cours
                 updateCoursesDisplay(data);
             })
             .catch(error => console.error('Error:', error));
@@ -173,9 +172,64 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateCoursesDisplay(courses) {
-    // Logique pour mettre à jour l'affichage des cours
     const coursesContainer = document.querySelector('.grid');
-    // ... code pour mettre à jour l'affichage ...
+    let html = '';
+    
+    courses.forEach(course => {
+        html += `
+            <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+                <div class="h-48 bg-gray-200 rounded-t-lg relative overflow-hidden">
+                    ${course.thumbnail ? `
+                        <img src="${course.thumbnail}" 
+                             alt="${course.title}"
+                             class="w-full h-full object-cover">
+                    ` : ''}
+                    <span class="absolute top-4 left-4 bg-blue-600 text-white text-sm px-4 py-1 rounded-full">
+                        ${course.category_name}
+                    </span>
+                </div>
+                
+                <div class="p-6 flex-1 flex flex-col">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        ${course.title}
+                    </h3>
+                    
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 mr-3">
+                            ${course.teacher_name.charAt(0).toUpperCase()}
+                        </div>
+                        <span class="text-gray-600">
+                            ${course.teacher_name}
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4 flex-1">
+                        ${course.description.substring(0, 100)}...
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        ${course.tags ? course.tags.map(tag => `
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-md text-sm">
+                                ${tag.name}
+                            </span>
+                        `).join('') : ''}
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t mt-auto">
+                        <div class="text-gray-600 text-sm">
+                            <span>${course.student_count} Students</span>
+                        </div>
+                        <a href="/course/${course.id}" 
+                           class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                            Voir le cours
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    coursesContainer.innerHTML = html;
 }
 </script>
 <?php

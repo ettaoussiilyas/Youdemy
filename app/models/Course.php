@@ -557,25 +557,29 @@
 
         public function getPopularCourses() {
             try {
-                $sql = "SELECT c.*, cat.name as category_name, u.name as teacher_name,
-                       (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) as student_count
+                $sql = "SELECT c.*, 
+                       cat.name as category_name,
+                       u.name as teacher_name,
+                       COUNT(DISTINCT e.student_id) as student_count
                 FROM courses c
                 LEFT JOIN categories cat ON c.category_id = cat.id
                 LEFT JOIN users u ON c.teacher_id = u.id
-                WHERE c.status = 'active'
+                LEFT JOIN enrollments e ON c.id = e.course_id
+                GROUP BY c.id
                 ORDER BY student_count DESC";
                 
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute();
                 $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // Charger les tags pour chaque cours
+                // جلب التاگز لكل كورس
                 foreach ($courses as &$course) {
-                    $sql = "SELECT t.* 
-                           FROM tags t 
-                           JOIN course_tags ct ON t.id = ct.tag_id 
-                           WHERE ct.course_id = ?";
-                    $stmt = $this->conn->prepare($sql);
+                    $stmt = $this->conn->prepare("
+                        SELECT t.* 
+                        FROM tags t
+                        JOIN course_tags ct ON t.id = ct.tag_id
+                        WHERE ct.course_id = ?
+                    ");
                     $stmt->execute([$course['id']]);
                     $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
@@ -585,6 +589,62 @@
                 error_log("Error fetching popular courses: " . $e->getMessage());
                 return [];
             }
+        }
+
+        public function searchCourses($search = '', $category = '', $tag = '') {
+            $sql = "SELECT DISTINCT 
+                    c.*, 
+                    cat.name as category_name,
+                    u.name as teacher_name,
+                    COUNT(DISTINCT e.student_id) as student_count
+                    FROM courses c
+                    LEFT JOIN categories cat ON c.category_id = cat.id
+                    LEFT JOIN users u ON c.teacher_id = u.id
+                    LEFT JOIN course_tags ct ON c.id = ct.course_id
+                    LEFT JOIN tags t ON ct.tag_id = t.id
+                    LEFT JOIN enrollments e ON c.id = e.course_id
+                    WHERE 1=1";
+            
+            $params = [];
+            
+            //add search conditions
+            if (!empty($search)) {
+                $sql .= " AND (c.title LIKE ? OR c.description LIKE ?)";
+                $params[] = "%$search%";
+                $params[] = "%$search%";
+            }
+            
+            //filter by category
+            if (!empty($category)) {
+                $sql .= " AND c.category_id = ?";
+                $params[] = $category;
+            }
+            
+            //filter by tag
+            if (!empty($tag)) {
+                $sql .= " AND t.id = ?";
+                $params[] = $tag;
+            }
+            
+            $sql .= " GROUP BY c.id ORDER BY student_count DESC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
+            $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            //get tags for each course
+            foreach ($courses as &$course) {
+                $stmt = $this->conn->prepare("
+                    SELECT t.* 
+                    FROM tags t
+                    JOIN course_tags ct ON t.id = ct.tag_id
+                    WHERE ct.course_id = ?
+                ");
+                $stmt->execute([$course['id']]);
+                $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            
+            return $courses;
         }
 
     }
