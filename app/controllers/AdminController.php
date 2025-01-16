@@ -15,6 +15,7 @@ class AdminController extends BaseController{
     private $studentModel;
     private $teacherModel;
     private $enrollmentModel;
+    private $userModel;
     
     public function __construct() {
 
@@ -26,6 +27,7 @@ class AdminController extends BaseController{
         $this->studentModel = new Student();
         $this->teacherModel = new Teacher();
         $this->enrollmentModel = new Enrollment();
+        $this->userModel = new User();
    
     }
 
@@ -251,6 +253,45 @@ class AdminController extends BaseController{
             header('Location: /admin/categories');
         } catch (Exception $e) {
             header('Location: /admin/categories?error=delete_failed');
+        }
+    }
+
+    public function stats() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            // Get basic stats
+            $totalUsers = $this->userModel->getTotalUsers();
+            $activeCourses = $this->courseModel->getTotalActiveCourses();
+            $totalCategories = $this->categoryModel->getTotalCategories();
+            $totalTags = $this->tagModel->getTotalTags();
+
+            // Get growth rates
+            $userGrowth = $this->userModel->getGrowthRate();
+            $courseGrowth = $this->courseModel->getGrowthRate();
+
+            // Get popular categories and tags
+            $popularCategories = $this->categoryModel->getPopularCategories();
+            $popularTags = $this->tagModel->getPopularTags();
+
+            $this->render('admin/stats', [
+                'totalUsers' => $totalUsers,
+                'activeCourses' => $activeCourses,
+                'totalCategories' => $totalCategories,
+                'totalTags' => $totalTags,
+                'userGrowth' => $userGrowth,
+                'courseGrowth' => $courseGrowth,
+                'popularCategories' => $popularCategories,
+                'popularTags' => $popularTags
+            ]);
+        } catch (Exception $e) {
+            error_log("Error loading stats: " . $e->getMessage());
+            $this->render('admin/stats', [
+                'error' => 'Failed to load statistics'
+            ]);
         }
     }
 }

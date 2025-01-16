@@ -41,4 +41,34 @@ class Tag extends Db {
             return false;
         }
     }
+
+    public function getTotalTags() {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM tags";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['total'];
+        } catch (PDOException $e) {
+            error_log("Error getting total tags: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function getPopularTags() {
+        try {
+            $sql = "SELECT t.name, COUNT(ct.course_id) as count
+                    FROM tags t
+                    LEFT JOIN course_tags ct ON t.id = ct.tag_id
+                    GROUP BY t.id, t.name
+                    ORDER BY count DESC
+                    LIMIT 10";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting popular tags: " . $e->getMessage());
+            return [];
+        }
+    }
 } 

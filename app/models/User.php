@@ -41,4 +41,35 @@ class User extends Db {
             return false;
         }
     }
+
+    public function getTotalUsers() {
+        try {
+            $sql = "SELECT COUNT(*) as total FROM users";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['total'];
+        } catch (PDOException $e) {
+            error_log("Error getting total users: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function getGrowthRate() {
+        try {
+            $sql = "SELECT 
+                        (COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH) THEN 1 END) * 100.0 / 
+                         NULLIF(COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 2 MONTH) 
+                                          AND created_at < DATE_SUB(NOW(), INTERVAL 1 MONTH) THEN 1 END), 0)) - 100 
+                    as growth_rate 
+                    FROM users";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return round($result['growth_rate'], 1);
+        } catch (PDOException $e) {
+            error_log("Error calculating user growth rate: " . $e->getMessage());
+            return 0;
+        }
+    }
 }

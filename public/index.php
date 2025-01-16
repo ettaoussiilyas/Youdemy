@@ -84,6 +84,7 @@ Route::post('/admin/categories/add', [AdminController::class, 'addCategory']);
 Route::get('/admin/categories/delete/{id}', [AdminController::class, 'deleteCategory']);
 Route::post('/admin/tags/add', [AdminController::class, 'addTag']);
 Route::get('/admin/tags/delete/{id}', [AdminController::class, 'deleteTag']);
+Route::get('/admin/statistics', [AdminController::class, 'stats']);
 
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
