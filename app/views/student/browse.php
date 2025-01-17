@@ -52,7 +52,23 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="coursesGrid">
             <?php foreach($courses as $course): ?>
                 <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <!-- Course Header -->
+                    <!-- Course Image -->
+                    <div class="h-48 rounded-t-xl relative overflow-hidden">
+                        <?php if($course['thumbnail']): ?>
+                            <img src="<?php echo htmlspecialchars($course['thumbnail']); ?>" 
+                                 alt="<?php echo htmlspecialchars($course['title']); ?>"
+                                 class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <div class="w-full h-full bg-gradient-to-r from-violet-500 to-purple-800 flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white text-4xl"></i>
+                            </div>
+                        <?php endif; ?>
+                        <span class="absolute top-4 left-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
+                            <?php echo htmlspecialchars($course['category_name']); ?>
+                        </span>
+                    </div>
+
+                    <!-- Course Content -->
                     <div class="p-6">
                         <div class="flex items-center justify-between mb-4">
                             <div class="h-12 w-12 rounded-lg bg-violet-100 flex items-center justify-center">
@@ -132,6 +148,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 courses.forEach(course => {
                     html += `
                         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                            <!-- Course Image -->
+                            <div class="h-48 rounded-t-xl relative overflow-hidden">
+                                ${course.thumbnail ? `
+                                    <img src="${course.thumbnail}" 
+                                         alt="${course.title}"
+                                         class="w-full h-full object-cover">
+                                ` : `
+                                    <div class="w-full h-full bg-gradient-to-r from-violet-500 to-purple-800 flex items-center justify-center">
+                                        <i class="fas fa-graduation-cap text-white text-4xl"></i>
+                                    </div>
+                                `}
+                                <span class="absolute top-4 left-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
+                                    ${course.category_name}
+                                </span>
+                            </div>
+
+                            <!-- Course Content -->
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-4">
                                     <div class="h-12 w-12 rounded-lg bg-violet-100 flex items-center justify-center">
