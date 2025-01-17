@@ -22,11 +22,37 @@ class User extends Db {
 
     public function deleteUser($userId) {
         try {
+            $this->conn->beginTransaction();
+
+            // Supprimer d'abord les enregistrements liés dans d'autres tables
+            $tables = [
+                'enrollments' => 'student_id',
+                'notifications' => 'recipient_id',
+                'courses' => 'teacher_id'
+            ];
+
+            foreach ($tables as $table => $column) {
+                $sql = "DELETE FROM $table WHERE $column = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$userId]);
+            }
+
+            // Enfin, supprimer l'utilisateur
             $sql = "DELETE FROM users WHERE id = ?";
             $stmt = $this->conn->prepare($sql);
-            return $stmt->execute([$userId]);
+            $result = $stmt->execute([$userId]);
+
+            if ($result) {
+                $this->conn->commit();
+                return true;
+            }
+
+            $this->conn->rollBack();
+            return false;
+
         } catch (PDOException $e) {
-            error_log("Error deleting user: " . $e->getMessage());
+            $this->conn->rollBack();
+            error_log("Error in deleteUser: " . $e->getMessage());
             return false;
         }
     }
