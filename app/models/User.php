@@ -86,4 +86,15 @@ class User extends Db {
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function createUser($name, $email, $password, $role){
+        $sql = "INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        if($role === 'teacher'){
+            return $stmt->execute([$name, $email, $password, $role, 'review']);
+        }else{
+            return $stmt->execute([$name, $email, $password, $role, 'active']);
+        }
+    }
+
 }
