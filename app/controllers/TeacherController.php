@@ -54,70 +54,83 @@ class TeacherController extends BaseController {
 
     public function storeCourse() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $courseData = [
-                'title' => $_POST['title'],
-                'description' => $_POST['description'],
-                'teacher_id' => $_SESSION['user_id'],
-                'category_id' => $_POST['category_id'],
-                'tags' => isset($_POST['tags']) ? $_POST['tags'] : []
-            ];
+            try {
+                // Validate thumbnail URL if provided
+                $thumbnail = isset($_POST['thumbnail']) ? trim($_POST['thumbnail']) : null;
+                if ($thumbnail && !filter_var($thumbnail, FILTER_VALIDATE_URL)) {
+                    throw new Exception("Invalid thumbnail URL format");
+                }
 
-            $courseId = $this->courseModel->create($courseData);
-            
-            if ($courseId) {
-                // 2. Save chapters and their content
-                if (isset($_POST['chapters']) && is_array($_POST['chapters'])) {
-                    foreach ($_POST['chapters'] as $index => $chapter) {
-                        // Create chapter
-                        $chapterData = [
-                            'course_id' => $courseId,
-                            'title' => $chapter['title'],
-                            'description' => $chapter['description']
-                        ];
+                $courseData = [
+                    'title' => $_POST['title'],
+                    'description' => $_POST['description'],
+                    'teacher_id' => $_SESSION['user_id'],
+                    'category_id' => $_POST['category_id'],
+                    'thumbnail' => $thumbnail,  // Add thumbnail to course data
+                    'tags' => isset($_POST['tags']) ? $_POST['tags'] : []
+                ];
 
-                        $chapterId = $this->chapterModel->create($chapterData);
-                        
-                        if (!$chapterId) {
-                            throw new Exception("Erreur lors de la création d'un chapitre");
-                        }
-
-                        // Handle file upload
-                        if (isset($_FILES['chapters']['name'][$index]['content'])) {
-                            // Restructure files array for this specific file
-                            $file = [
-                                'name' => $_FILES['chapters']['name'][$index]['content'],
-                                'type' => $_FILES['chapters']['type'][$index]['content'],
-                                'tmp_name' => $_FILES['chapters']['tmp_name'][$index]['content'],
-                                'error' => $_FILES['chapters']['error'][$index]['content'],
-                                'size' => $_FILES['chapters']['size'][$index]['content']
-                            ];
-
-                            // Upload file using helper
-                            $uploadResult = $this->uploadHelper->uploadChapterContent(
-                                $file,
-                                $courseId,
-                                $chapterId,
-                                $chapter['type']
-                            );
-
-                            // Save content info to database
-                            $contentData = [
-                                'chapter_id' => $chapterId,
+                $courseId = $this->courseModel->create($courseData);
+                
+                if ($courseId) {
+                    // 2. Save chapters and their content
+                    if (isset($_POST['chapters']) && is_array($_POST['chapters'])) {
+                        foreach ($_POST['chapters'] as $index => $chapter) {
+                            // Create chapter
+                            $chapterData = [
+                                'course_id' => $courseId,
                                 'title' => $chapter['title'],
-                                'type' => $chapter['type'],
-                                'file_path' => $uploadResult['file_path'],
-                                'original_name' => $uploadResult['original_name']
+                                'description' => $chapter['description']
                             ];
 
-                            if (!$this->chapterModel->addContent($contentData)) {
-                                throw new Exception("Erreur lors de l'ajout du contenu");
+                            $chapterId = $this->chapterModel->create($chapterData);
+                            
+                            if (!$chapterId) {
+                                throw new Exception("Erreur lors de la création d'un chapitre");
+                            }
+
+                            // Handle file upload
+                            if (isset($_FILES['chapters']['name'][$index]['content'])) {
+                                // Restructure files array for this specific file
+                                $file = [
+                                    'name' => $_FILES['chapters']['name'][$index]['content'],
+                                    'type' => $_FILES['chapters']['type'][$index]['content'],
+                                    'tmp_name' => $_FILES['chapters']['tmp_name'][$index]['content'],
+                                    'error' => $_FILES['chapters']['error'][$index]['content'],
+                                    'size' => $_FILES['chapters']['size'][$index]['content']
+                                ];
+
+                                // Upload file using helper
+                                $uploadResult = $this->uploadHelper->uploadChapterContent(
+                                    $file,
+                                    $courseId,
+                                    $chapterId,
+                                    $chapter['type']
+                                );
+
+                                // Save content info to database
+                                $contentData = [
+                                    'chapter_id' => $chapterId,
+                                    'title' => $chapter['title'],
+                                    'type' => $chapter['type'],
+                                    'file_path' => $uploadResult['file_path'],
+                                    'original_name' => $uploadResult['original_name']
+                                ];
+
+                                if (!$this->chapterModel->addContent($contentData)) {
+                                    throw new Exception("Erreur lors de l'ajout du contenu");
+                                }
                             }
                         }
                     }
-                }
 
-                $_SESSION['success'] = "Cours créé avec succès!";
-                header("Location: /teacher/dashboard");
+                    $_SESSION['success'] = "Cours créé avec succès!";
+                    header("Location: /teacher/dashboard");
+                    exit;
+                }
+            } catch (Exception $e) {
+                $_SESSION['error'] = $e->getMessage();
+                header('Location: /teacher/course/create');
                 exit;
             }
         }

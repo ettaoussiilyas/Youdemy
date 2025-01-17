@@ -177,23 +177,51 @@
 
         public function create($data) {
             try {
-                $sql = "INSERT INTO courses (title, description, category_id, teacher_id) 
-                        VALUES (:title, :description, :category_id, :teacher_id)";
+                $sql = "INSERT INTO courses (
+                    title, 
+                    description, 
+                    teacher_id, 
+                    category_id, 
+                    thumbnail,
+                    created_at
+                ) VALUES (
+                    :title, 
+                    :description, 
+                    :teacher_id, 
+                    :category_id, 
+                    :thumbnail,
+                    NOW()
+                )";
                 
                 $stmt = $this->conn->prepare($sql);
-                
-                $stmt->execute([
+                $result = $stmt->execute([
                     ':title' => $data['title'],
                     ':description' => $data['description'],
+                    ':teacher_id' => $data['teacher_id'],
                     ':category_id' => $data['category_id'],
-                    ':teacher_id' => $data['teacher_id']
+                    ':thumbnail' => !empty($data['thumbnail']) ? $data['thumbnail'] : 'https://placehold.co/600x400?text=Course'
                 ]);
 
-                return $this->conn->lastInsertId();
+                if (!$result) {
+                    throw new Exception("Failed to create course");
+                }
+
+                $courseId = $this->conn->lastInsertId();
+
+                // Use Tag model for handling tags
+                $tagModel = new Tag();
                 
+                // Handle tags if present
+                if (isset($data['tags']) && is_array($data['tags'])) {
+                    foreach ($data['tags'] as $tagId) {
+                        $tagModel->addTag($courseId, $tagId);
+                    }
+                }
+
+                return $courseId;
             } catch (PDOException $e) {
-                error_log("Error creating course: " . $e->getMessage());
-                return false;
+                error_log("Error in create course: " . $e->getMessage());
+                throw new Exception("Error creating course");
             }
         }
 

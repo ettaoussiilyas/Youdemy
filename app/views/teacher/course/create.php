@@ -28,6 +28,19 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Thumbnail URL (CDN)
+                        </label>
+                        <input type="url" 
+                               name="thumbnail" 
+                               placeholder="https://example.com/image.jpg"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <p class="mt-1 text-sm text-gray-500">
+                            Enter a valid image URL for your course thumbnail
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
                             Description
                         </label>
                         <textarea name="description" rows="3" required
