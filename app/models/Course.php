@@ -407,16 +407,18 @@
             $sql = "SELECT 
                 c.*,
                 u.name as teacher_name,
+                cat.name as category_name,
                 (SELECT COUNT(*) FROM chapters WHERE course_id = c.id) as chapter_count,
                 (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count,
                 CASE WHEN e.student_id IS NOT NULL THEN 1 ELSE 0 END as is_enrolled
             FROM courses c
             JOIN users u ON c.teacher_id = u.id
+            LEFT JOIN categories cat ON c.category_id = cat.id
             LEFT JOIN enrollments e ON c.id = e.course_id AND e.student_id = ?
             ORDER BY c.created_at DESC";
             
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute([$_SESSION['user_id']]);
+            $stmt->execute([$_SESSION['user_id'] ?? null]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
@@ -596,31 +598,31 @@
                     c.*, 
                     cat.name as category_name,
                     u.name as teacher_name,
-                    COUNT(DISTINCT e.student_id) as student_count
+                    u.profile_image as teacher_image,
+                    COUNT(DISTINCT e2.student_id) as student_count,
+                    CASE WHEN e1.student_id IS NOT NULL THEN 1 ELSE 0 END as is_enrolled
                     FROM courses c
                     LEFT JOIN categories cat ON c.category_id = cat.id
                     LEFT JOIN users u ON c.teacher_id = u.id
                     LEFT JOIN course_tags ct ON c.id = ct.course_id
                     LEFT JOIN tags t ON ct.tag_id = t.id
-                    LEFT JOIN enrollments e ON c.id = e.course_id
+                    LEFT JOIN enrollments e1 ON c.id = e1.course_id AND e1.student_id = ?
+                    LEFT JOIN enrollments e2 ON c.id = e2.course_id
                     WHERE 1=1";
             
-            $params = [];
+            $params = [$_SESSION['user_id'] ?? null];  // Handle case where user is not logged in
             
-            //add search conditions
             if (!empty($search)) {
                 $sql .= " AND (c.title LIKE ? OR c.description LIKE ?)";
                 $params[] = "%$search%";
                 $params[] = "%$search%";
             }
             
-            //filter by category
             if (!empty($category)) {
                 $sql .= " AND c.category_id = ?";
                 $params[] = $category;
             }
             
-            //filter by tag
             if (!empty($tag)) {
                 $sql .= " AND t.id = ?";
                 $params[] = $tag;
@@ -628,23 +630,28 @@
             
             $sql .= " GROUP BY c.id ORDER BY student_count DESC";
             
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute($params);
-            $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            //get tags for each course
-            foreach ($courses as &$course) {
-                $stmt = $this->conn->prepare("
-                    SELECT t.* 
-                    FROM tags t
-                    JOIN course_tags ct ON t.id = ct.tag_id
-                    WHERE ct.course_id = ?
-                ");
-                $stmt->execute([$course['id']]);
-                $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            try {
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute($params);
+                $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Get tags for each course (maintaining existing functionality)
+                foreach ($courses as &$course) {
+                    $stmt = $this->conn->prepare("
+                        SELECT t.* 
+                        FROM tags t
+                        JOIN course_tags ct ON t.id = ct.tag_id
+                        WHERE ct.course_id = ?
+                    ");
+                    $stmt->execute([$course['id']]);
+                    $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                return $courses;
+            } catch (PDOException $e) {
+                error_log("Error in searchCourses: " . $e->getMessage());
+                return [];
             }
-            
-            return $courses;
         }
 
     }

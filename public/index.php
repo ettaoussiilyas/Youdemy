@@ -87,7 +87,7 @@ Route::post('/admin/tags/add', [AdminController::class, 'addTag']);
 Route::get('/admin/tags/delete/{id}', [AdminController::class, 'deleteTag']);
 Route::get('/admin/statistics', [AdminController::class, 'stats']);
 
-// API Routes (زيد هاد السطر قبل dispatch)
+//search api
 Route::get('/api/courses/filter', [CourseController::class, 'filterCourses']);
 //Route to browse courses
 Route::get('/courses', [CourseController::class, 'browseCourses']);
@@ -95,5 +95,5 @@ Route::get('/courses', [CourseController::class, 'browseCourses']);
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 
-Route::get('/api/courses/filter', [CourseController::class, 'filter']);
+// Route::get('/api/courses/filter', [CourseController::class, 'filter']);
 

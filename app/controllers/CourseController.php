@@ -30,16 +30,16 @@
                     exit;
                 }
                 
-                // جلب الفصول مع المحتوى
+                // get the chapters with the content
                 $chapters = $this->courseModel->getCourseChaptersWithContent($id);
                 
-                // التحقق من تسجيل الطالب (إذا كان مسجل)
+                // check if the student is enrolled (if he is)
                 $isEnrolled = false;
                 if (isset($_SESSION['user_id'])) {
                     $isEnrolled = $this->courseModel->isStudentEnrolled($_SESSION['user_id'], $id);
                 }
                 
-                // عرض صفحة تفاصيل الكورس
+                // render the course details page
                 $this->render('course/details', [
                     'course' => $course,
                     'chapters' => $chapters,
@@ -83,14 +83,14 @@
 
         public function browseCourses() {
             try {
-                // جلب جميع الكورسات
+                // get all courses
                 $courses = $this->courseModel->getAllCourses();
                 
-                // جلب التصنيفات والتاگز للفلترة
+                // get all categories and tags for filtering
                 $categories = $this->categoryModel->getAll();
                 $tags = $this->tagModel->getAll();
                 
-                // عرض الصفحة
+                // render the page
                 $this->render('course/browse', [
                     'courses' => $courses,
                     'categories' => $categories,

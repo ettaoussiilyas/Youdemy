@@ -7,12 +7,16 @@ class StudentController extends BaseController {
     private $enrollmentModel;
     private $userModel;
     private $chapterModel;
+    private $categoryModel;
+    private $tagModel;
 
     public function __construct() {
         $this->courseModel = new Course();
         $this->enrollmentModel = new Enrollment();
         $this->userModel = new User();
         $this->chapterModel = new Chapter();
+        $this->categoryModel = new Category();
+        $this->tagModel = new Tag();
     }
 
     public function dashboard() {
@@ -37,11 +41,24 @@ class StudentController extends BaseController {
     }
 
     public function browseCourses() {
-        $courses = $this->courseModel->getAllAvailable();
-        
-        $this->renderStudent('browse', [
-            'courses' => $courses
-        ]);
+        try {
+            // Using existing getAllAvailable method which already includes enrollment status
+            $courses = $this->courseModel->getAllAvailable();
+            
+            // Get categories and tags for filters
+            $categories = $this->categoryModel->getAll();
+            $tags = $this->tagModel->getAll();
+            
+            $this->render('student/browse', [
+                'courses' => $courses,
+                'categories' => $categories,
+                'tags' => $tags
+            ]);
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Une erreur s'est produite.";
+            header('Location: /student/dashboard');
+            exit;
+        }
     }
 
     public function viewCourse($courseId) {
