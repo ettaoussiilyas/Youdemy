@@ -95,6 +95,20 @@
                         </div>
                     </div>
                     
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Thumbnail URL (CDN)
+                        </label>
+                        <input type="url" 
+                               name="thumbnail" 
+                               value="<?php echo htmlspecialchars($course['thumbnail']); ?>"
+                               placeholder="https://placehold.co/600x400?text=Course"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <p class="mt-1 text-sm text-gray-500">
+                            Enter a valid image URL for your course thumbnail
+                        </p>
+                    </div>
+                    
                 </div>
             </div>
 

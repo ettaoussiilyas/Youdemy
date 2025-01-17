@@ -243,10 +243,17 @@ class TeacherController extends BaseController {
             $success = null;
             
             try {
+                // Validate thumbnail URL if provided
+                $thumbnail = isset($_POST['thumbnail']) ? trim($_POST['thumbnail']) : null;
+                if ($thumbnail && !filter_var($thumbnail, FILTER_VALIDATE_URL)) {
+                    throw new Exception("Invalid thumbnail URL format");
+                }
+
                 // Mise à jour du cours
                 $courseData = [
                     'id' => $courseId,
                     'title' => $_POST['title'],
+                    'thumbnail' => $thumbnail,  // Use validated thumbnail
                     'description' => $_POST['description'],
                     'category_id' => $_POST['category_id'],
                     'tags' => isset($_POST['tags']) ? $_POST['tags'] : []
@@ -291,7 +298,7 @@ class TeacherController extends BaseController {
                     }
                 }
 
-                $success = "Cours mis à jour avec succès";
+                $success = "Course updated successfully";
                 $this->renderTeacher('mycourses', [
                     'courses' => $this->courseModel->getTeacherCourses($_SESSION['user_id']),
                     'error' => null,

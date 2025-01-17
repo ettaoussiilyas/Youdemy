@@ -322,29 +322,24 @@
 
         public function update($data) {
             try {
-                $this->conn->beginTransaction();
+                $sql = "UPDATE courses 
+                        SET title = :title, 
+                            description = :description, 
+                            category_id = :category_id,
+                            thumbnail = :thumbnail
+                        WHERE id = :id";
 
-                $stmt = $this->conn->prepare("
-                    UPDATE courses 
-                    SET title = ?, description = ?, category_id = ?
-                    WHERE id = ?
-                ");
-
-                $result = $stmt->execute([
-                    $data['title'],
-                    $data['description'],
-                    $data['category_id'],
-                    $data['id']
+                $stmt = $this->conn->prepare($sql);
+                
+                return $stmt->execute([
+                    ':title' => $data['title'],
+                    ':description' => $data['description'],
+                    ':category_id' => $data['category_id'],
+                    ':thumbnail' => $data['thumbnail'],
+                    ':id' => $data['id']
                 ]);
-
-                if ($result && isset($data['tags'])) {
-                    $this->updateTags($data['id'], $data['tags']);
-                }
-
-                $this->conn->commit();
-                return true;
             } catch (PDOException $e) {
-                $this->conn->rollBack();
+                error_log("Error updating course: " . $e->getMessage());
                 return false;
             }
         }
