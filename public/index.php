@@ -4,11 +4,25 @@
 require_once '../app/config/db.php';
 
 // Second: Core classes
-require_once '../core/BaseController.php';  // Updated correct path
+require_once '../core/BaseController.php';
 require_once '../core/Router.php';
 require_once '../core/Route.php';
 
-// Third: Controllers
+// Third: Base Models and Abstract classes (IMPORTANT: Load these first)
+require_once '../app/models/notifications/AbstractNotification.php';  // This MUST come first
+
+// Fourth: Specific Notification classes
+require_once '../app/models/notifications/SignupNotification.php';
+require_once '../app/models/notifications/AccountActivationNotification.php';
+require_once '../app/models/notifications/AccountStatusNotification.php';
+require_once '../app/models/NotificationManager.php';
+
+// Fifth: Models
+require_once '../app/models/User.php';
+require_once '../app/models/Course.php';
+// ... other models ...
+
+// Sixth: Controllers
 require_once '../app/controllers/AuthController.php';
 require_once '../app/controllers/CourseController.php';
 require_once '../app/controllers/ChapterController.php';
@@ -16,12 +30,6 @@ require_once '../app/controllers/TeacherController.php';
 require_once '../app/controllers/StudentController.php';
 require_once '../app/controllers/AdminController.php';
 require_once '../app/controllers/HomeController.php';
-
-// Add Notification Classes
-require_once '../app/models/notifications/AbstractNotification.php';
-require_once '../app/models/notifications/SignupNotification.php';
-require_once '../app/models/notifications/AccountActivationNotification.php';
-require_once '../app/models/NotificationManager.php';
 require_once '../app/controllers/NotificationController.php';
 
 session_start();

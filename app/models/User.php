@@ -126,6 +126,15 @@ class User extends Db {
         return $stmt->fetch();
     }
 
-    
+    public function getUserById($id) {
+        try {
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {
+            error_log("Erreur lors de la récupération de l'utilisateur: " . $e->getMessage());
+            return false;
+        }
+    }
 
 }
