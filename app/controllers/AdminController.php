@@ -5,6 +5,7 @@ require_once __DIR__ . '/../models/Chapter.php';
 require_once __DIR__ . '/../models/Category.php';
 require_once __DIR__ . '/../models/Tag.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/notifications/AccountStatusNotification.php';
 
 class AdminController extends BaseController{
 
@@ -113,24 +114,45 @@ class AdminController extends BaseController{
         }
     }
 
-    public function updateUserStatus($userId, $newStatus) {
-        error_log("updateUserStatus called with userId=$userId, newStatus=$newStatus");
-        
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            error_log("Access denied: not admin");
-            header('Location: /login');
-            exit;
-        }
-
+    public function updateUserStatus($id, $status) {
         try {
-            $userModel = new User();
-            $result = $userModel->updateUserStatus($userId, $newStatus);
-            error_log("Update status result: " . ($result ? "success" : "failed"));
-            header('Location: /admin/users');
+            // Récupérer les informations de l'utilisateur
+            $user = $this->userModel->getUserById($id);
+            
+            if (!$user) {
+                $_SESSION['error'] = "Utilisateur non trouvé";
+                header('Location: /admin/users');
+                exit;
+            }
+
+            // Mettre à jour le statut
+            $updated = $this->userModel->updateUserStatus($id, $status);
+            
+            if ($updated) {
+                // Envoyer la notification
+                try {
+                    $notification = new AccountStatusNotification(
+                        $id,      // ID de l'utilisateur qui reçoit la notification
+                        $status,  // nouveau statut ('active' ou 'blocked')
+                        $user['name']  // nom de l'utilisateur
+                    );
+                    $notification->send();
+                } catch (Exception $e) {
+                    error_log("Erreur lors de l'envoi de la notification: " . $e->getMessage());
+                }
+
+                $_SESSION['success'] = "Statut de l'utilisateur mis à jour avec succès";
+            } else {
+                $_SESSION['error'] = "Échec de la mise à jour du statut";
+            }
+            
         } catch (Exception $e) {
-            error_log("Error updating user status: " . $e->getMessage());
-            header('Location: /admin/users?error=status_update_failed');
+            $_SESSION['error'] = "Une erreur est survenue";
+            error_log($e->getMessage());
         }
+        
+        header('Location: /admin/users');
+        exit;
     }
 
     public function content() {
