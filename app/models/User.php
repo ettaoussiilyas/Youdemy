@@ -97,4 +97,13 @@ class User extends Db {
         }
     }
 
+    public function getStatus($id){
+        $sql = "SELECT status FROM users WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    
+
 }
