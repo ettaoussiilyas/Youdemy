@@ -262,43 +262,50 @@
             try {
                 $this->conn->beginTransaction();
 
-                // 1. Get all chapters for this course
+                // 1. Delete course tags first
+                $sql = "DELETE FROM course_tags WHERE course_id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+
+                // 2. Check if course has chapters
                 $sql = "SELECT id FROM chapters WHERE course_id = ?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$courseId]);
                 $chapters = $stmt->fetchAll();
 
-                // 2. Delete content files from storage
-                foreach ($chapters as $chapter) {
-                    // Delete chapter content files
-                    $sql = "SELECT file_path FROM chapter_content WHERE chapter_id = ?";
-                    $stmt = $this->conn->prepare($sql);
-                    $stmt->execute([$chapter['id']]);
-                    $contents = $stmt->fetchAll();
+                if (!empty($chapters)) {
+                    // Handle chapters if they exist
+                    foreach ($chapters as $chapter) {
+                        // Delete chapter content files
+                        $sql = "SELECT file_path FROM chapter_content WHERE chapter_id = ?";
+                        $stmt = $this->conn->prepare($sql);
+                        $stmt->execute([$chapter['id']]);
+                        $contents = $stmt->fetchAll();
 
-                    foreach ($contents as $content) {
-                        if (file_exists($content['file_path'])) {
-                            unlink($content['file_path']); // Delete physical file
+                        foreach ($contents as $content) {
+                            if (!empty($content['file_path']) && file_exists($content['file_path'])) {
+                                unlink($content['file_path']); // Delete physical file
+                            }
                         }
+
+                        // Delete chapter content records
+                        $sql = "DELETE FROM chapter_content WHERE chapter_id = ?";
+                        $stmt = $this->conn->prepare($sql);
+                        $stmt->execute([$chapter['id']]);
                     }
 
-                    // Delete chapter content records
-                    $sql = "DELETE FROM chapter_content WHERE chapter_id = ?";
+                    // Delete all chapters
+                    $sql = "DELETE FROM chapters WHERE course_id = ?";
                     $stmt = $this->conn->prepare($sql);
-                    $stmt->execute([$chapter['id']]);
+                    $stmt->execute([$courseId]);
                 }
 
-                // 3. Delete chapters
-                $sql = "DELETE FROM chapters WHERE course_id = ?";
-                $stmt = $this->conn->prepare($sql);
-                $stmt->execute([$courseId]);
-
-                // 4. Delete enrollments
+                // 3. Delete enrollments
                 $sql = "DELETE FROM enrollments WHERE course_id = ?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$courseId]);
 
-                // 5. Finally delete the course
+                // 4. Delete the course
                 $sql = "DELETE FROM courses WHERE id = ?";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([$courseId]);
