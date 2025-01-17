@@ -39,6 +39,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <?php foreach($courses as $course): ?>
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <!-- Add Thumbnail Image -->
+                <div class="aspect-video w-full overflow-hidden bg-gray-100">
+                    <?php if (!empty($course['thumbnail'])): ?>
+                        <img src="<?php echo htmlspecialchars($course['thumbnail']); ?>" 
+                             alt="<?php echo htmlspecialchars($course['title']); ?>"
+                             class="w-full h-full object-cover">
+                    <?php else: ?>
+                        <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                            <i class="fas fa-book text-4xl text-gray-400"></i>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <span class="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
