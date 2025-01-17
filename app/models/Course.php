@@ -451,13 +451,17 @@
         }
 
         public function getCourseTags($courseId) {
-            $stmt = $this->conn->prepare("
-                SELECT tag_id 
-                FROM course_tags 
-                WHERE course_id = ?
-            ");
-            $stmt->execute([$courseId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            try {
+                $sql = "SELECT tag_id FROM course_tags WHERE course_id = ?";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$courseId]);
+                
+                // Return array of tag IDs
+                return array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'tag_id');
+            } catch (PDOException $e) {
+                error_log("Error getting course tags: " . $e->getMessage());
+                return [];
+            }
         }
 
         public function updateTags($courseId, $tagIds) {

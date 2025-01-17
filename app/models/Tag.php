@@ -15,7 +15,7 @@ class Tag extends Db {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Error fetching tags: " . $e->getMessage());
+            error_log("Error getting all tags: " . $e->getMessage());
             return [];
         }
     }
@@ -77,5 +77,47 @@ class Tag extends Db {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getCourseTags($courseId) {
+        try {
+            $sql = "SELECT t.id, t.name 
+                    FROM tags t
+                    INNER JOIN course_tags ct ON t.id = ct.tag_id
+                    WHERE ct.course_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$courseId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting course tags: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function updateCourseTags($courseId, $tagIds) {
+        try {
+            $this->conn->beginTransaction();
+            
+            // Delete existing tags
+            $sql = "DELETE FROM course_tags WHERE course_id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$courseId]);
+            
+            // Insert new tags
+            if (!empty($tagIds)) {
+                $sql = "INSERT INTO course_tags (course_id, tag_id) VALUES (?, ?)";
+                $stmt = $this->conn->prepare($sql);
+                foreach ($tagIds as $tagId) {
+                    $stmt->execute([$courseId, $tagId]);
+                }
+            }
+            
+            $this->conn->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->conn->rollBack();
+            error_log("Error updating course tags: " . $e->getMessage());
+            return false;
+        }
     }
 } 

@@ -71,20 +71,30 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
+                     <!-- Tag Selection Section -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Tags</label>
+                        <div class="flex flex-wrap gap-2 mb-2">
+                            <?php 
+                            $courseTags = isset($course) ? $tagModel->getCourseTags($course['id']) : [];
+                            $courseTagIds = array_column($courseTags, 'id');
+                            $allTags = $tagModel->getAllTags();
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Tags
-                        </label>
-                        <select name="tags[]" multiple="multiple" class="tags-select w-full">
-                            <?php foreach($tags as $tag): ?>
-                                <option value="<?php echo $tag['id']; ?>" 
-                                        <?php echo in_array($tag['id'], array_column($courseTags, 'tag_id')) ? 'selected' : ''; ?>>
-                                    <?php echo $tag['name']; ?>
-                                </option>
+                            foreach($allTags as $tag): 
+                                $isSelected = in_array($tag['id'], $courseTagIds);
+                            ?>
+                                <label class="inline-flex items-center bg-gray-100 rounded-full px-3 py-1 cursor-pointer hover:bg-gray-200">
+                                    <input type="checkbox" 
+                                           name="tags[]" 
+                                           value="<?php echo $tag['id']; ?>" 
+                                           <?php echo $isSelected ? 'checked' : ''; ?>
+                                           class="form-checkbox h-4 w-4 text-blue-600 mr-2">
+                                    <span class="text-sm text-gray-700"><?php echo $tag['name']; ?></span>
+                                </label>
                             <?php endforeach; ?>
-                        </select>
+                        </div>
                     </div>
+                    
                 </div>
             </div>
 

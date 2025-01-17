@@ -231,7 +231,8 @@ class TeacherController extends BaseController {
             'categories' => $categories,
             'chapters' => $chapters,
             'tags' => $tags,
-            'courseTags' => $courseTags
+            'courseTags' => $courseTags,
+            'tagModel' => $this->tagModel
         ]);
     }
 
