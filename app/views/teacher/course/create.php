@@ -80,6 +80,12 @@
                 <div id="chapters-container" class="space-y-6">
                     <!-- Template for a chapter -->
                     <div class="chapter-item border rounded-md p-4">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-md font-medium">Chapter</h3>
+                            <button type="button" class="delete-chapter text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -154,6 +160,12 @@ document.getElementById('add-chapter').addEventListener('click', function() {
     const container = document.getElementById('chapters-container');
     const template = `
         <div class="chapter-item border rounded-md p-4">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-md font-medium">Chapter</h3>
+                <button type="button" class="delete-chapter text-red-500 hover:text-red-700">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -248,5 +260,18 @@ $(document).ready(function() {
         'color': 'white',
         'margin-right': '5px'
     });
+});
+
+// Add delete functionality for chapters
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.delete-chapter')) {
+        if (document.querySelectorAll('.chapter-item').length > 1) {
+            if (confirm('Are you sure you want to delete this chapter?')) {
+                e.target.closest('.chapter-item').remove();
+            }
+        } else {
+            alert('You cannot delete the last chapter. At least one chapter is required.');
+        }
+    }
 });
 </script> 

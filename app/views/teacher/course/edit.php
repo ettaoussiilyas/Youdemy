@@ -170,7 +170,7 @@
                                         data-chapter-id="<?php echo $chapter['id']; ?>"
                                         data-course-id="<?php echo $course['id']; ?>">
                                     <i class="fas fa-trash mr-2"></i> 
-                                    Supprimer ce chapitre
+                                    Delete this chapter
                                 </button>
                             </div>
                         </div>
