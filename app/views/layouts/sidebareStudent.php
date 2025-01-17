@@ -54,6 +54,13 @@
             </div>
             <span class="font-medium">Profile</span>
         </a>
+
+        <a href="/notifications" class="group flex items-center px-4 py-3 text-gray-300 hover:text-white rounded-xl transition-all duration-200">
+            <div class="mr-3 w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                <i class="fas fa-bell text-blue-400"></i>
+            </div>
+            <span class="font-medium">Notifications</span>
+        </a>
     </nav>
 
     <!-- Bottom Section -->

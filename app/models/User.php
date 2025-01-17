@@ -87,13 +87,35 @@ class User extends Db {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function createUser($name, $email, $password, $role){
-        $sql = "INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        if($role === 'teacher'){
-            return $stmt->execute([$name, $email, $password, $role, 'review']);
-        }else{
-            return $stmt->execute([$name, $email, $password, $role, 'active']);
+    // public function createUser($name, $email, $password, $role){
+    //     $sql = "INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, ?, ?)";
+    //     $stmt = $this->conn->prepare($sql);
+    //     if($role === 'teacher'){
+    //         return $stmt->execute([$name, $email, $password, $role, 'review']);
+    //     }else{
+    //         return $stmt->execute([$name, $email, $password, $role, 'active']);
+    //     }
+    // }
+    public function createUser($name, $email, $password, $role) {
+        try {
+            $sql = "INSERT INTO users (name, email, password, role, status) 
+                    VALUES (:name, :email, :password, :role, :status)";
+            
+            $stmt = $this->conn->prepare($sql);
+            $status = ($role === 'teacher') ? 'review' : 'active';
+            
+            $stmt->execute([
+                ':name' => $name,
+                ':email' => $email,
+                ':password' => $password,
+                ':role' => $role,
+                ':status' => $status
+            ]);
+            
+            return $this->conn->lastInsertId(); // Return the new user's ID
+        } catch(PDOException $e) {
+            error_log("Error creating user: " . $e->getMessage());
+            return false;
         }
     }
 

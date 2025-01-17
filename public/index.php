@@ -17,6 +17,13 @@ require_once '../app/controllers/StudentController.php';
 require_once '../app/controllers/AdminController.php';
 require_once '../app/controllers/HomeController.php';
 
+// Add Notification Classes
+require_once '../app/models/notifications/AbstractNotification.php';
+require_once '../app/models/notifications/SignupNotification.php';
+require_once '../app/models/notifications/AccountActivationNotification.php';
+require_once '../app/models/NotificationManager.php';
+require_once '../app/controllers/NotificationController.php';
+
 session_start();
 
 $router = new Router();
@@ -91,7 +98,12 @@ Route::get('/admin/statistics', [AdminController::class, 'stats']);
 Route::get('/api/courses/filter', [CourseController::class, 'filterCourses']);
 //Route to browse courses
 Route::get('/courses', [CourseController::class, 'browseCourses']);
-// Dans la section des routes
+
+
+// Notification Routes
+Route::get('/notifications', [NotificationController::class, 'index']);
+Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);
+
 // Dispatch la requête
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 
