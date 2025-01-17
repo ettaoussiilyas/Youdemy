@@ -131,9 +131,16 @@
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-            $created = $this->userModel->createUser($name, $email, $password_hash, $role);
+            $userId = $this->userModel->createUser($name, $email, $password_hash, $role);
 
-            if($created){
+            if($userId) {
+                // Create notification with the actual user ID
+                try {
+                    $notification = new SignupNotification($userId, $name); // Pass the actual user ID
+                    $notification->send();
+                } catch (Exception $e) {
+                    error_log("Failed to send signup notification: " . $e->getMessage());
+                }
                 return $this->render('auth/login', ['success' => 'Account created successfully']);
             }else{
                 return $this->render('auth/signup', ['errors' => 'Failed to create account']);
