@@ -33,6 +33,7 @@ class HomeController extends BaseController {
     }
 
     public function index() {
+
         try {
             $courses = $this->courseModel->getPopularCourses();
             $categories = $this->categoryModel->getAllCategories();

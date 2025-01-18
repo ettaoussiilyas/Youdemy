@@ -40,7 +40,7 @@
 
                     <!-- Email Input -->
                     <div>
-                        <input type="email" placeholder="Email" name="email"
+                        <input type="text" placeholder="Email" name="email"
                                class="w-full px-4 py-2 text-gray-700 bg-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
                     </div>
 

@@ -135,11 +135,8 @@
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                 return $this->render('auth/signup',['errors' => 'This Email Form is not valid']);
             }
-            if(!is_string($name)){
-                return $this->render('auth/signup',['errors' => 'The name not Valide']);
-            }
-            if(!is_string($password)){
-                return $this->render('auth/signup',['errors' => 'The password not Valide']);
+            if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
+                return $this->render('auth/signup', ['errors' => 'Name can only contain letters and spaces']);
             }
 
 
