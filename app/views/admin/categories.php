@@ -41,7 +41,7 @@
                     <h2 class="text-xl font-bold text-gray-800">Tags</h2>
                     <button onclick="showTagModal()" 
                             class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                        <i class="fas fa-plus mr-2"></i>Add Tag
+                        <i class="fas fa-plus mr-2"></i>Add Tags
                     </button>
                 </div>
 
@@ -84,15 +84,16 @@
 <!-- Tag Modal -->
 <div id="tagModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
     <div class="bg-white rounded-xl p-6 w-96">
-        <h3 class="text-lg font-bold mb-4">Add New Tag</h3>
+        <h3 class="text-lg font-bold mb-4">Add New Tags</h3>
         <form action="/admin/tags/add" method="POST">
-            <input type="text" name="name" placeholder="Tag Name" 
-                   class="w-full px-4 py-2 border rounded-lg mb-4">
+            <input type="text" name="name" placeholder="Enter tags (comma separated)" 
+                   class="w-full px-4 py-2 border rounded-lg mb-2">
+            <p class="text-sm text-gray-600 mb-4">Example: web, design, freelance</p>
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="hideTagModal()" 
                         class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
                 <button type="submit" 
-                        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Add</button>
+                        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Add Tags</button>
             </div>
         </form>
     </div>

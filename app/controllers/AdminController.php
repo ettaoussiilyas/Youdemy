@@ -251,18 +251,32 @@ class AdminController extends BaseController{
     }
 
     public function addTag() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            header('Location: /login');
-            exit;
-        }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
-            try {
-                $this->tagModel->addTag($_POST['name']);
-                header('Location: /admin/categories');
-            } catch (Exception $e) {
-                header('Location: /admin/categories?error=add_failed');
+           
+            $tagNames = explode(',', $_POST['name']); // Split by comma
+            
+            $success = true;
+            $addedCount = 0;
+            
+            foreach ($tagNames as $tagName) {
+                $tagName = trim($tagName); // Remove whitespace
+                if (!empty($tagName)) {
+                    if ($this->tagModel->addTag($tagName)) {
+                        $addedCount++;
+                    } else {
+                        $success = false;
+                    }
+                }
             }
+
+            if ($success && $addedCount > 0) {
+                $_SESSION['success'] = "Successfully added " . $addedCount . " tag(s)";
+            } else {
+                $_SESSION['error'] = "Error adding one or more tags";
+            }
+            
+            header('Location: /admin/categories');
+            exit;
         }
     }
 
