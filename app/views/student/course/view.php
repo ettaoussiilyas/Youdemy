@@ -15,7 +15,7 @@
         <div class="grid grid-cols-12 gap-6">
             <!-- Chapters List -->
             <div class="col-span-4 bg-white rounded-xl shadow-md p-6">
-                <h2 class="text-lg font-semibold mb-4">Chapitres</h2>
+                <h2 class="text-lg font-semibold mb-4">Chapters</h2>
                 <div class="space-y-2">
                     <?php foreach($course['chapters'] as $index => $chapter): ?>
                         <button onclick="showChapterContent(<?php echo $chapter['id']; ?>)"
@@ -49,7 +49,7 @@
                                         <div class="aspect-w-16 aspect-h-9 bg-gray-900 rounded-lg">
                                             <video controls class="w-full h-full object-contain">
                                                 <source src="/<?php echo $chapter['content']['file_path']; ?>" type="video/mp4">
-                                                Votre navigateur ne supporte pas la lecture de vidéos.
+                                                Your browser does not support the video tag.
                                             </video>
                                         </div>
                                     <?php else: ?>
@@ -61,14 +61,14 @@
                                                         <p class="font-medium text-gray-800 truncate">
                                                             <?php echo $chapter['content']['original_name']; ?>
                                                         </p>
-                                                        <p class="text-sm text-gray-500">Document PDF</p>
+                                                        <p class="text-sm text-gray-500">PDF Document</p>
                                                     </div>
                                                 </div>
                                                 <a href="/<?php echo $chapter['content']['file_path']; ?>" 
                                                    target="_blank"
                                                    class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors flex-shrink-0">
                                                     <i class="fas fa-download mr-2"></i>
-                                                    Télécharger
+                                                    Download
                                                 </a>
                                             </div>
                                         </div>
@@ -77,7 +77,7 @@
                             <?php else: ?>
                                 <div class="text-center text-gray-500 py-8">
                                     <i class="fas fa-info-circle text-2xl mb-2"></i>
-                                    <p>Aucun contenu disponible pour ce chapitre.</p>
+                                    <p>No content available for this chapter.</p>
                                 </div>
                             <?php endif; ?>
                         </div>

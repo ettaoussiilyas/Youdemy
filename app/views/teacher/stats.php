@@ -15,7 +15,7 @@
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Total des cours</p>
+                        <p class="text-sm font-medium text-gray-600">Total Courses</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1"><?php echo $totalCourses; ?></h3>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
@@ -28,7 +28,7 @@
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Total des étudiants</p>
+                        <p class="text-sm font-medium text-gray-600">Total students</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1"><?php echo $totalStudents; ?></h3>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center">
@@ -41,7 +41,7 @@
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600">Total des chapitres</p>
+                        <p class="text-sm font-medium text-gray-600">Total Chapters</p>
                         <h3 class="text-3xl font-bold text-gray-800 mt-1"><?php echo $totalChapters; ?></h3>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -54,7 +54,7 @@
         <!-- Enhanced Courses Table with Visual Elements -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-800">Détails par cours</h2>
+                <h2 class="text-lg font-semibold text-gray-800">Details by Courses</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -96,7 +96,7 @@
                                         <?php endfor; ?>
                                     </div>
                                     <span class="text-sm text-gray-600">
-                                        <?php echo $course['student_count']; ?> étudiants
+                                        <?php echo $course['student_count']; ?> Students
                                     </span>
                                 </div>
                             </td>

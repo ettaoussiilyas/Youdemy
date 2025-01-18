@@ -7,8 +7,8 @@
     <div class="ml-64 flex-1 p-8 pt-20 bg-gray-50">
         <!-- Header Section -->
         <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">Mon Profil</h1>
-            <p class="text-gray-600">Gérer vos informations personnelles</p>
+            <h1 class="text-2xl font-bold text-gray-800">My Profile</h1>
+            <p class="text-gray-600">Manage your personal information</p>
         </div>
 
         <!-- Profile Info Card -->
@@ -29,7 +29,7 @@
 
             <!-- Stats Section -->
             <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Statistiques d'apprentissage</h3>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Learning Statistics</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Enrolled Courses -->
                     <div class="bg-gray-50 rounded-xl p-4">
@@ -39,7 +39,7 @@
                             </div>
                             <span class="text-2xl font-bold text-gray-800"><?php echo $stats['total_courses']; ?></span>
                         </div>
-                        <p class="text-sm text-gray-600">Cours inscrits</p>
+                        <p class="text-sm text-gray-600">Enrolled Courses</p>
                     </div>
 
                     <!-- Average Progress -->
@@ -50,7 +50,7 @@
                             </div>
                             <span class="text-2xl font-bold text-gray-800"><?php echo round($stats['avg_progress']); ?>%</span>
                         </div>
-                        <p class="text-sm text-gray-600">Progression moyenne</p>
+                        <p class="text-sm text-gray-600">Average Progress</p>
                     </div>
 
                     <!-- Last Activity -->
@@ -63,7 +63,7 @@
                                 <?php echo date('d/m/Y', strtotime($stats['last_activity'])); ?>
                             </span>
                         </div>
-                        <p class="text-sm text-gray-600">Dernière activité</p>
+                        <p class="text-sm text-gray-600">Last Activity</p>
                     </div>
                 </div>
             </div>

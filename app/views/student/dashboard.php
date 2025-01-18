@@ -7,8 +7,8 @@
     <div class="ml-64 flex-1 p-8 pt-20 bg-gray-50">
         <!-- Welcome Section -->
         <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">Bienvenue, <?php echo $_SESSION['user_name']; ?></h1>
-            <p class="text-gray-600">Continuez votre apprentissage</p>
+            <h1 class="text-2xl font-bold text-gray-800">Welcome, <?php echo $_SESSION['user_name']; ?></h1>
+            <p class="text-gray-600">Continue your learning</p>
         </div>
 
         <!-- Enrolled Courses Section -->
@@ -22,7 +22,7 @@
                                 <i class="fas fa-book text-violet-600 text-xl"></i>
                             </div>
                             <span class="px-3 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-600">
-                                <?php echo $course['progress']; ?>% Complété
+                                <?php echo $course['progress']; ?>% Completed
                             </span>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-2"><?php echo $course['title']; ?></h3>
@@ -37,14 +37,14 @@
                         <!-- Last Accessed -->
                         <div class="flex items-center text-sm text-gray-500 mb-4">
                             <i class="far fa-clock mr-2"></i>
-                            Dernier accès: <?php echo date('d/m/Y', strtotime($course['last_accessed'])); ?>
+                            Last access: <?php echo date('d/m/Y', strtotime($course['last_accessed'])); ?>
                         </div>
 
                         <!-- Continue Button -->
                         <a href="/student/course/<?php echo $course['id']; ?>" 
                            class="block w-full px-4 py-2 bg-violet-600 text-white text-center rounded-lg hover:bg-violet-700 transition">
                             <i class="fas fa-play-circle mr-2"></i>
-                            Continuer
+                            Continue
                         </a>
                     </div>
                 </div>
@@ -55,12 +55,12 @@
                     <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-books text-gray-400 text-2xl"></i>
                     </div>
-                    <h3 class="text-gray-800 font-medium mb-2">Aucun cours inscrit</h3>
-                    <p class="text-gray-600 mb-4">Commencez votre apprentissage en parcourant nos cours disponibles</p>
+                    <h3 class="text-gray-800 font-medium mb-2">No course enrolled</h3>
+                    <p class="text-gray-600 mb-4">Start your learning by browsing our available courses</p>
                     <a href="/student/browse" 
                        class="inline-flex items-center text-violet-600 hover:text-violet-700 transition">
                         <i class="fas fa-search mr-2"></i>
-                        Parcourir les cours
+                        Browse courses
                     </a>
                 </div>
             <?php endif; ?>

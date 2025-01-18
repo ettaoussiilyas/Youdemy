@@ -149,7 +149,7 @@
                                             <?php if ($chapter['content']['type'] === 'video'): ?>
                                                 <span class="flex items-center">
                                                     <i class="fas fa-video mr-2"></i>
-                                                    Vidéo: <?php echo htmlspecialchars($chapter['content']['original_name']); ?>
+                                                    Video: <?php echo htmlspecialchars($chapter['content']['original_name']); ?>
                                                 </span>
                                             <?php else: ?>
                                                 <span class="flex items-center">
@@ -165,14 +165,14 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                                        Nouveau fichier (optionnel)
+                                        New File (optionnel)
                                     </label>
                                     <input type="file" 
                                            name="chapters[<?php echo $chapter['id']; ?>][content]"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
                                            accept=".mp4,.webm,.pdf,.doc,.docx">
                                     <p class="mt-1 text-xs text-gray-500">
-                                        Vidéos: MP4, WEBM (max 100MB)<br>
+                                        Videos: MP4, WEBM (max 100MB)<br>
                                         Documents: PDF, DOC, DOCX
                                     </p>
                                 </div>
@@ -235,7 +235,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Titre du chapitre
+                        Title of Chapter
                     </label>
                     <input type="text" 
                            name="new_chapters[${chapterCount}][title]" 
@@ -255,7 +255,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Type de contenu
+                            Content Type
                         </label>
                         <select name="new_chapters[${chapterCount}][type]" required
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
@@ -266,14 +266,14 @@ document.getElementById('add-chapter').addEventListener('click', function() {
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Fichier
+                            File
                         </label>
                         <input type="file" 
                                name="new_chapters[${chapterCount}][content]"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
                                accept=".mp4,.webm,.pdf,.doc,.docx">
                         <p class="mt-1 text-xs text-gray-500">
-                            Vidéos: MP4, WEBM (max 100MB)<br>
+                            Videos: MP4, WEBM (max 100MB)<br>
                             Documents: PDF, DOC, DOCX
                         </p>
                     </div>
@@ -294,7 +294,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
 });
 
 function deleteChapter(chapterId, courseId) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce chapitre ?')) {
+    if (!confirm('Are you sure you want to delete this chapter ?')) {
         return;
     }
 
@@ -317,15 +317,15 @@ function deleteChapter(chapterId, courseId) {
             const chapterElement = document.querySelector(`#chapter-${chapterId}`);
             if (chapterElement) {
                 chapterElement.remove();
-                showMessage('success', 'Chapitre supprimé avec succès');
+                showMessage('success', 'Chapter Delete Sucssefly');
             }
         } else {
-            showMessage('error', data.message || 'Erreur lors de la suppression');
+            showMessage('error', data.message || 'Error on moment of Delet');
         }
     })
     .catch(error => {
         console.error('Error:', error); // Debug log
-        showMessage('error', 'Une erreur est survenue');
+        showMessage('error', 'An error has occurred');
     });
 }
 
@@ -366,13 +366,13 @@ document.addEventListener('change', function(e) {
 // Initialisation de Select2 pour les tags
 $(document).ready(function() {
     $('.tags-select').select2({
-        placeholder: 'Sélectionnez les tags',
+        placeholder: 'Select tags',
         allowClear: true,
         width: '100%',
         theme: 'classic',
         language: {
             noResults: function() {
-                return "Aucun tag trouvé";
+                return "No Tags Finding";
             }
         }
     });

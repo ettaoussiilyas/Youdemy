@@ -8,8 +8,8 @@
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Mes cours</h1>
-                <p class="text-gray-600">Gérez vos cours inscrits</p>
+                <h1 class="text-2xl font-bold text-gray-800">My Courses</h1>
+                <p class="text-gray-600">Manage your enrolled courses</p>
             </div>
         </div>
 
@@ -30,7 +30,7 @@
                         <?php endif; ?>
                         <!-- Progress Badge -->
                         <span class="absolute top-4 right-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
-                            <?php echo $course['progress']; ?>% Complété
+                            <?php echo $course['progress']; ?>% Completed
                         </span>
                     </div>
 
@@ -56,7 +56,7 @@
                         <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
                             <div class="flex items-center">
                                 <i class="fas fa-book-open mr-2"></i>
-                                <?php echo $course['chapter_count']; ?> chapitres
+                                <?php echo $course['chapter_count']; ?> chapters
                             </div>
                             <div class="flex items-center">
                                 <i class="far fa-clock mr-2"></i>
@@ -68,7 +68,7 @@
                         <a href="/student/course/<?php echo $course['id']; ?>" 
                            class="block w-full px-4 py-2 bg-violet-600 text-white text-center rounded-lg hover:bg-violet-700 transition">
                             <i class="fas fa-play-circle mr-2"></i>
-                            Continuer
+                            Continue
                         </a>
                     </div>
                 </div>
@@ -79,12 +79,12 @@
                     <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-books text-gray-400 text-2xl"></i>
                     </div>
-                    <h3 class="text-gray-800 font-medium mb-2">Aucun cours inscrit</h3>
-                    <p class="text-gray-600 mb-4">Commencez votre apprentissage en parcourant nos cours disponibles</p>
+                    <h3 class="text-gray-800 font-medium mb-2">No course enrolled</h3>
+                    <p class="text-gray-600 mb-4">Start your learning by browsing our available courses</p>
                     <a href="/student/browse" 
                        class="inline-flex items-center text-violet-600 hover:text-violet-700 transition">
                         <i class="fas fa-search mr-2"></i>
-                        Parcourir les cours
+                        Browse courses
                     </a>
                 </div>
             <?php endif; ?>

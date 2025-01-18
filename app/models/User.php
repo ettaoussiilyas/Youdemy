@@ -158,7 +158,7 @@ class User extends Db {
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch(PDOException $e) {
-            error_log("Erreur lors de la récupération de l'utilisateur: " . $e->getMessage());
+            error_log("Error fetching user: " . $e->getMessage());
             return false;
         }
     }

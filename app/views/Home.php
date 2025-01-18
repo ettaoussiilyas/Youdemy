@@ -6,10 +6,10 @@
 <section class="bg-gradient-to-r from-violet-500 to-gray-900 text-white py-20">
     <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-6">Bienvenue sur Youdemy</h1>
-            <p class="text-xl mb-8">Découvrez des milliers de cours en ligne pour développer vos compétences</p>
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Welcome to Youdemy</h1>
+            <p class="text-xl mb-8">Discover thousands of online courses to develop your skills</p>
             <a href="/courses" class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
-                Explorer les cours
+                Explore Courses
             </a>
         </div>
     </div>
@@ -34,7 +34,7 @@
             <div class="flex gap-4 items-center">
                 <!-- Category Filter -->
                 <select id="categoryFilter" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Toutes les catégories</option>
+                    <option value="">All Categories</option>
                     <?php foreach($categories as $category): ?>
                         <option value="<?php echo $category['id']; ?>">
                             <?php echo htmlspecialchars($category['name']); ?>
@@ -44,7 +44,7 @@
 
                 <!-- Tags Filter -->
                 <select id="tagFilter" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Tous les tags</option>
+                    <option value="">All Tags</option>
                     <?php foreach($tags as $tag): ?>
                         <option value="<?php echo $tag['id']; ?>">
                             <?php echo htmlspecialchars($tag['name']); ?>
@@ -59,7 +59,7 @@
 <!-- Popular Courses Section -->
 <section class="py-16">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Cours populaires</h2>
+        <h2 class="text-3xl font-bold text-center mb-12">Popular Courses</h2>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <?php foreach($courses as $course): ?>
@@ -116,7 +116,7 @@
                             </div>
                             <a href="/course/<?php echo $course['id']; ?>" 
                                class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                                Voir le cours
+                                View Course
                             </a>
                         </div>
                     </div>
