@@ -1,6 +1,6 @@
 <?php
 
-require_once '../app/includes/autoloaderControllers.php';
+require_once __DIR__ . '/../../core/RoleMiddleware.php';
 
 class StudentController extends BaseController {
     private $courseModel;
@@ -11,6 +11,8 @@ class StudentController extends BaseController {
     private $tagModel;
 
     public function __construct() {
+        parent::__construct();
+        RoleMiddleware::checkRole(['student']);
         $this->courseModel = new Course();
         $this->enrollmentModel = new Enrollment();
         $this->userModel = new User();

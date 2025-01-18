@@ -4,6 +4,7 @@ require_once __DIR__ . '/../models/Chapter.php';
 require_once __DIR__ . '/../models/Category.php';
 require_once __DIR__ . '/../models/Tag.php';
 require_once __DIR__ . '/../helpers/UploadHelper.php';
+require_once __DIR__ . '/../../core/RoleMiddleware.php';
 
 class TeacherController extends BaseController {
     private $courseModel;
@@ -14,6 +15,7 @@ class TeacherController extends BaseController {
     
     public function __construct() {
         parent::__construct();
+        RoleMiddleware::checkRole(['teacher']);
         $this->courseModel = new Course();
         $this->chapterModel = new Chapter();
         $this->categoryModel = new Category();

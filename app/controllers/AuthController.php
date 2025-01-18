@@ -41,6 +41,8 @@
             $email = $_POST['email'];
             $password = $_POST['password'];
 
+
+
             if (empty($email) || empty($password)) {
                 return $this->render('auth/login', ['errors' => 'Please fill all fields']);
             }
@@ -99,9 +101,11 @@
         }
 
         public function signupChecker(){
+
             if (!$_SERVER['REQUEST_METHOD'] === 'POST' || !isset($_POST['signup'])) {
                 return $this->render('auth/signup');
             }
+
 
             $name = $_POST['full_name'];
             $email = $_POST['email'];
@@ -128,6 +132,16 @@
             if(strlen($name) < 8){
                 return $this->render('auth/signup', ['errors' => 'Name must be at least 8 characters long']);
             }
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                return $this->render('auth/signup',['errors' => 'This Email Form is not valid']);
+            }
+            if(!is_string($name)){
+                return $this->render('auth/signup',['errors' => 'The name not Valide']);
+            }
+            if(!is_string($password)){
+                return $this->render('auth/signup',['errors' => 'The password not Valide']);
+            }
+
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
 

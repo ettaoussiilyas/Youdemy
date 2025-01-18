@@ -1,12 +1,32 @@
 <?php
 
-    
+require_once __DIR__ . '/RoleMiddleware.php';
+
 class Router
 {
     private $routes = [
         'GET' => [],
         'POST' => [],
- 
+    ];
+
+    private $protectedRoutes = [
+        '/admin' => ['admin'],
+        '/admin/users' => ['admin'],
+        '/admin/dashboard' => ['admin'],
+        '/admin/content' => ['admin'],
+        '/admin/categories' => ['admin'],
+        '/admin/statistics' => ['admin'],
+        
+        '/teacher/dashboard' => ['teacher'],
+        '/teacher/courses' => ['teacher'],
+        '/teacher/course/create' => ['teacher'],
+        '/teacher/mycourses' => ['teacher'],
+        '/teacher/stats' => ['teacher'],
+        
+        '/student/dashboard' => ['student'],
+        '/student/courses' => ['student'],
+        '/student/browse' => ['student'],
+        '/student/profile' => ['student']
     ];
 
     // Add a route
@@ -27,6 +47,14 @@ class Router
         // Remove query strings
         $uri = parse_url($uri, PHP_URL_PATH);
         $method = strtoupper($method);
+
+        // Check if route needs role validation +
+        foreach ($this->protectedRoutes as $protectedRoute => $roles) {
+            if (strpos($uri, $protectedRoute) === 0) {
+                RoleMiddleware::checkRole($roles);
+                break;
+            }
+        }
 
         foreach ($this->routes[$method] as $route => $callback) {
             // Check if the route matches
@@ -50,6 +78,6 @@ class Router
 
         // Handle 404
         http_response_code(404);
-     	echo "404 - Not Found";
+        echo "404 - Not Found";
     }
 }

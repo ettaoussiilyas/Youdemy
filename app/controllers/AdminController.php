@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../../core/RoleMiddleware.php';
 require_once __DIR__ . '/../models/Course.php';
 require_once __DIR__ . '/../models/Chapter.php';
 require_once __DIR__ . '/../models/Category.php';
@@ -21,6 +22,7 @@ class AdminController extends BaseController{
     public function __construct() {
 
         parent::__construct();
+        RoleMiddleware::checkRole(['admin']);
         $this->courseModel = new Course();
         $this->chapterModel = new Chapter();
         $this->categoryModel = new Category();
