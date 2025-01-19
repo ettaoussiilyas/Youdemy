@@ -397,4 +397,200 @@ $(document).ready(function() {
         'margin-right': '5px'
     });
 });
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(e) {
+        let errors = [];
+        
+        // Validate course basic information
+        const title = form.querySelector('input[name="title"]').value.trim();
+        const description = form.querySelector('textarea[name="description"]').value.trim();
+        const categoryId = form.querySelector('select[name="category_id"]').value;
+        const thumbnail = form.querySelector('input[name="thumbnail"]').value.trim();
+
+        // Title validation
+        if (!title) {
+            errors.push("Course title is required");
+        } else if (title.length > 255) {
+            errors.push("Course title must not exceed 255 characters");
+        }
+
+        // Description validation
+        if (!description) {
+            errors.push("Course description is required");
+        }
+
+        // Category validation
+        if (!categoryId) {
+            errors.push("Please select a category");
+        }
+
+        // Thumbnail URL validation (if provided)
+        if (thumbnail && !isValidUrl(thumbnail)) {
+            errors.push("Please enter a valid thumbnail URL");
+        }
+
+        // Validate existing chapters
+        const existingChapters = document.querySelectorAll('#existing-chapters .chapter-item');
+        existingChapters.forEach((chapter, index) => {
+            const chapterId = chapter.id.replace('chapter-', '');
+            const chapterTitle = chapter.querySelector(`input[name="chapters[${chapterId}][title]"]`).value.trim();
+            const chapterDescription = chapter.querySelector(`textarea[name="chapters[${chapterId}][description]"]`).value.trim();
+            const chapterFile = chapter.querySelector(`input[name="chapters[${chapterId}][content]"]`);
+
+            if (!chapterTitle) {
+                errors.push(`Title is required for existing chapter ${index + 1}`);
+            }
+
+            if (!chapterDescription) {
+                errors.push(`Description is required for existing chapter ${index + 1}`);
+            }
+
+            // Validate file if one is selected
+            if (chapterFile && chapterFile.files.length > 0) {
+                const file = chapterFile.files[0];
+                const fileType = file.type;
+                const fileSize = file.size;
+
+                // Check file size (100MB max)
+                if (fileSize > 100 * 1024 * 1024) {
+                    errors.push(`File size must not exceed 100MB in chapter ${index + 1}`);
+                }
+
+                // Check file type
+                if (!isValidFileType(fileType)) {
+                    errors.push(`Invalid file type in chapter ${index + 1}. Allowed types: MP4, WEBM, PDF, DOC, DOCX`);
+                }
+            }
+        });
+
+        // Validate new chapters
+        const newChapters = document.querySelectorAll('#new-chapters-container .chapter-item');
+        newChapters.forEach((chapter, index) => {
+            const chapterTitle = chapter.querySelector('input[name^="new_chapters"][name$="[title]"]').value.trim();
+            const chapterDescription = chapter.querySelector('textarea[name^="new_chapters"][name$="[description]"]').value.trim();
+            const chapterType = chapter.querySelector('select[name^="new_chapters"][name$="[type]"]').value;
+            const chapterFile = chapter.querySelector('input[name^="new_chapters"][name$="[content]"]');
+
+            if (!chapterTitle) {
+                errors.push(`Title is required for new chapter ${index + 1}`);
+            }
+
+            if (!chapterDescription) {
+                errors.push(`Description is required for new chapter ${index + 1}`);
+            }
+
+            // File is required for new chapters
+            if (!chapterFile.files.length) {
+                errors.push(`File is required for new chapter ${index + 1}`);
+            } else {
+                const file = chapterFile.files[0];
+                const fileType = file.type;
+                const fileSize = file.size;
+
+                // Check file size
+                if (fileSize > 100 * 1024 * 1024) {
+                    errors.push(`File size must not exceed 100MB in new chapter ${index + 1}`);
+                }
+
+                // Check file type based on selected type
+                if (chapterType === 'video') {
+                    if (!isValidVideoType(fileType)) {
+                        errors.push(`Invalid video format in new chapter ${index + 1}. Allowed types: MP4, WEBM`);
+                    }
+                } else {
+                    if (!isValidDocumentType(fileType)) {
+                        errors.push(`Invalid document format in new chapter ${index + 1}. Allowed types: PDF, DOC, DOCX`);
+                    }
+                }
+            }
+        });
+
+        // If there are errors, prevent form submission and show errors
+        if (errors.length > 0) {
+            e.preventDefault();
+            showValidationErrors(errors);
+        }
+    });
+});
+
+// Helper functions
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+function isValidFileType(type) {
+    const validTypes = [
+        'video/mp4',
+        'video/webm',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    return validTypes.includes(type);
+}
+
+function isValidVideoType(type) {
+    const validTypes = ['video/mp4', 'video/webm'];
+    return validTypes.includes(type);
+}
+
+function isValidDocumentType(type) {
+    const validTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    return validTypes.includes(type);
+}
+
+function showValidationErrors(errors) {
+    // Remove existing error messages
+    const existingErrors = document.querySelector('.validation-errors');
+    if (existingErrors) {
+        existingErrors.remove();
+    }
+
+    // Create error message container
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'validation-errors bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4';
+    
+    // Create error list
+    const errorList = document.createElement('ul');
+    errorList.className = 'list-disc pl-5';
+    errors.forEach(error => {
+        const li = document.createElement('li');
+        li.textContent = error;
+        errorList.appendChild(li);
+    });
+    
+    errorDiv.appendChild(errorList);
+    
+    // Insert error messages at the top of the form
+    const form = document.querySelector('form');
+    form.insertBefore(errorDiv, form.firstChild);
+
+    // Scroll to error messages
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Update file input accept attribute based on chapter type selection
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('chapter-type')) {
+        const fileInput = e.target.closest('.chapter-item').querySelector('.chapter-file');
+        if (e.target.value === 'video') {
+            fileInput.accept = '.mp4,.webm';
+        } else {
+            fileInput.accept = '.pdf,.doc,.docx';
+        }
+    }
+});
 </script>
