@@ -13,6 +13,49 @@
     <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6 mt-20">
         <h1 class="text-2xl font-bold mb-6">Create a new course</h1>
 
+        <!-- Ajoutez ce bloc pour afficher les erreurs -->
+        <?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
+            <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Several errors occurred:</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <?php foreach ($_SESSION['errors'] as $field => $error): ?>
+                                    <li><?php echo htmlspecialchars($error); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php unset($_SESSION['errors']); ?>
+        <?php endif; ?>
+
+        <!-- Ajoutez ce bloc pour afficher le message de succès -->
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700">
+                            <?php echo htmlspecialchars($_SESSION['success']); ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
         <form action="/teacher/course/store" method="POST" enctype="multipart/form-data" class="space-y-6">
             <!-- Course Details -->
             <div class="border-b pb-6">
@@ -22,7 +65,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Course title
                         </label>
-                        <input type="text" name="title" required 
+                        <input type="text" name="title" c 
                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
                     </div>
 
@@ -43,7 +86,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Description
                         </label>
-                        <textarea name="description" rows="3" required
+                        <textarea name="description" rows="3" c
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
                     </div>
 
@@ -51,7 +94,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Category
                         </label>
-                        <select name="category_id" required 
+                        <select name="category_id" c 
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             <?php foreach($categories as $category): ?>
                                 <option value="<?= $category['id'] ?>"><?= $category['name'] ?></option>
@@ -91,7 +134,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
                                     Chapter title
                                 </label>
-                                <input type="text" name="chapters[0][title]" required
+                                <input type="text" name="chapters[0][title]" c
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             </div>
 
@@ -108,7 +151,7 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
                                         Content type
                                     </label>
-                                    <select name="chapters[0][type]" required
+                                    <select name="chapters[0][type]" c
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
                                         <option value="video">Video</option>
                                         <option value="document">Document</option>
@@ -119,7 +162,7 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
                                         File
                                     </label>
-                                    <input type="file" name="chapters[0][content]" required
+                                    <input type="file" name="chapters[0][content]" c
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
                                            accept=".mp4,.webm,.pdf,.doc,.docx">
                                     <p class="mt-1 text-xs text-gray-500">
@@ -171,7 +214,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Titre du chapitre
                     </label>
-                    <input type="text" name="chapters[${chapterCount}][title]" required
+                    <input type="text" name="chapters[${chapterCount}][title]" c
                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
                 </div>
 
@@ -188,7 +231,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Type de contenu
                         </label>
-                        <select name="chapters[${chapterCount}][type]" required
+                        <select name="chapters[${chapterCount}][type]" c
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
                             <option value="video">Vidéo</option>
                             <option value="document">Document</option>
@@ -199,7 +242,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Fichier
                         </label>
-                        <input type="file" name="chapters[${chapterCount}][content]" required
+                        <input type="file" name="chapters[${chapterCount}][content]" c
                                class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-file"
                                accept=".mp4,.webm,.pdf,.doc,.docx">
                         <p class="mt-1 text-xs text-gray-500">
@@ -270,7 +313,7 @@ document.addEventListener('click', function(e) {
                 e.target.closest('.chapter-item').remove();
             }
         } else {
-            alert('You cannot delete the last chapter. At least one chapter is required.');
+            alert('You cannot delete the last chapter. At least one chapter is c.');
         }
     }
 });
