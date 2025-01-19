@@ -356,6 +356,54 @@ class TeacherController extends BaseController {
                 // Mise à jour des tags
                 $this->courseModel->updateTags($courseId, $courseData['tags']);
 
+                // Handle existing chapters updates
+                if (isset($_POST['chapters']) && is_array($_POST['chapters'])) {
+                    foreach ($_POST['chapters'] as $chapterId => $chapterData) {
+                        // Update chapter basic info
+                        $chapterUpdateData = [
+                            'id' => $chapterId,
+                            'title' => $chapterData['title'],
+                            'description' => $chapterData['description']
+                        ];
+
+                        if (!$this->chapterModel->update($chapterUpdateData)) {
+                            throw new Exception("Error updating chapter information");
+                        }
+
+                        // Handle file upload for existing chapter if new file is provided
+                        if (isset($_FILES['chapters']['name'][$chapterId]['content']) && 
+                            $_FILES['chapters']['error'][$chapterId]['content'] === UPLOAD_ERR_OK) {
+                            
+                            $file = [
+                                'name' => $_FILES['chapters']['name'][$chapterId]['content'],
+                                'type' => $_FILES['chapters']['type'][$chapterId]['content'],
+                                'tmp_name' => $_FILES['chapters']['tmp_name'][$chapterId]['content'],
+                                'error' => $_FILES['chapters']['error'][$chapterId]['content'],
+                                'size' => $_FILES['chapters']['size'][$chapterId]['content']
+                            ];
+
+                            // Upload new file
+                            $uploadResult = $this->uploadHelper->uploadChapterContent(
+                                $file,
+                                $courseId,
+                                $chapterId,
+                                $chapterData['type']
+                            );
+
+                            // Update content info in database
+                            $contentUpdateData = [
+                                'chapter_id' => $chapterId,
+                                'file_path' => $uploadResult['file_path'],
+                                'original_name' => $uploadResult['original_name']
+                            ];
+
+                            if (!$this->chapterModel->updateContent($contentUpdateData)) {
+                                throw new Exception("Error updating chapter content");
+                            }
+                        }
+                    }
+                }
+
                 // Traitement des nouveaux chapitres
                 if (isset($_POST['new_chapters'])) {
                     foreach ($_POST['new_chapters'] as $index => $chapterData) {
