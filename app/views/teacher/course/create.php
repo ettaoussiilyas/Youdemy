@@ -60,13 +60,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="tags-select">
                             Tags
                         </label>
-                        <select name="tags[]" multiple="multiple" class="tags-select w-full">
+                        <select id="tags-select" name="tags[]" multiple="multiple" class="tags-select w-full">
                             <?php foreach($tags as $tag): ?>
-                                <option value="<?php echo $tag['id']; ?>">
-                                    <?php echo $tag['name']; ?>
+                                <option value="<?php echo htmlspecialchars($tag['id']); ?>">
+                                    <?php echo htmlspecialchars($tag['name']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

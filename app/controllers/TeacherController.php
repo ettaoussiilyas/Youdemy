@@ -75,6 +75,12 @@ class TeacherController extends BaseController {
                 $courseId = $this->courseModel->create($courseData);
                 
                 if ($courseId) {
+                    // Save tags explicitly after course creation
+                    $tags = isset($_POST['tags']) ? $_POST['tags'] : [];
+                    if (!$this->courseModel->updateTags($courseId, $tags)) {
+                        throw new Exception("Error saving course tags");
+                    }
+                    
                     // 2. Save chapters and their content
                     if (isset($_POST['chapters']) && is_array($_POST['chapters'])) {
                         foreach ($_POST['chapters'] as $index => $chapter) {
