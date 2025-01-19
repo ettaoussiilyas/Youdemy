@@ -44,7 +44,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Course title
                         </label>
-                        <input type="text" name="title" required 
+                        <input type="text" name="title"   
                                value="<?php echo htmlspecialchars($course['title']); ?>"
                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition">
                     </div>
@@ -53,7 +53,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Description
                         </label>
-                        <textarea name="description" rows="3" required
+                        <textarea name="description" rows="3"  
                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition"><?php echo htmlspecialchars($course['description']); ?></textarea>
                     </div>
 
@@ -61,7 +61,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Category
                         </label>
-                        <select name="category_id" required 
+                        <select name="category_id"   
                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition">
                             <?php foreach($categories as $category): ?>
                                 <option value="<?php echo $category['id']; ?>" 
@@ -126,7 +126,7 @@
                                 <input type="text" 
                                        name="chapters[<?php echo $chapter['id']; ?>][title]" 
                                        value="<?php echo htmlspecialchars($chapter['title']); ?>"
-                                       required
+                                        
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             </div>
 
@@ -239,7 +239,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                     </label>
                     <input type="text" 
                            name="new_chapters[${chapterCount}][title]" 
-                           required
+                            
                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
                 </div>
 
@@ -257,7 +257,7 @@ document.getElementById('add-chapter').addEventListener('click', function() {
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Content Type
                         </label>
-                        <select name="new_chapters[${chapterCount}][type]" required
+                        <select name="new_chapters[${chapterCount}][type]"  
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md chapter-type">
                             <option value="video">Vidéo</option>
                             <option value="document">Document</option>
