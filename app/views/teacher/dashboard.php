@@ -72,7 +72,7 @@
                     <h2 class="text-xl font-bold text-gray-800">Recent Courses</h2>
                     <p class="text-gray-500 text-sm mt-1">Manage your latest courses</p>
                 </div>
-                <a href="/teacher/courses" 
+                <a href="/teacher/mycourses" 
                    class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-lg font-medium flex items-center transition-colors duration-200">
                     <span>View All</span>
                     <i class="fas fa-arrow-right ml-2"></i>
