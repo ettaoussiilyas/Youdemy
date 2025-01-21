@@ -134,110 +134,123 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchCourse');
     const categoryFilter = document.getElementById('categoryFilter');
     const tagFilter = document.getElementById('tagFilter');
+    const coursesGrid = document.querySelector('.grid');
+
+    let timeoutId;
 
     function filterCourses() {
-        const searchTerm = searchInput.value;
-        const selectedCategory = categoryFilter.value;
-        const selectedTag = tagFilter.value;
-        const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
+        clearTimeout(timeoutId);
+        
+        timeoutId = setTimeout(() => {
+            const searchTerm = searchInput.value;
+            const selectedCategory = categoryFilter.value;
+            const selectedTag = tagFilter.value;
+            const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
 
-        fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}&page=${currentPage}`)
-            .then(response => response.json())
-            .then(data => {
-                updateCoursesDisplay(data.courses);
-                updatePagination(data.currentPage, data.totalPages);
-            })
-            .catch(error => console.error('Error:', error));
+            fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}&page=${currentPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        // If data is just an array of courses (old format)
+                        updateCoursesDisplay(data);
+                    } else {
+                        // If data includes pagination info (new format)
+                        updateCoursesDisplay(data.courses);
+                        updatePagination(data.currentPage, data.totalPages);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }, 300);
     }
 
+    function updateCoursesDisplay(courses) {
+        let html = '';
+        courses.forEach(course => {
+            html += `
+                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div class="h-48 rounded-t-xl relative overflow-hidden">
+                        ${course.thumbnail ? `
+                            <img src="${course.thumbnail}" 
+                                 alt="${course.title}"
+                                 class="w-full h-full object-cover">
+                        ` : `
+                            <div class="w-full h-full bg-gradient-to-r from-violet-500 to-purple-800 flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white text-4xl"></i>
+                            </div>
+                        `}
+                        <span class="absolute top-4 left-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
+                            ${course.category_name}
+                        </span>
+                    </div>
+
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">
+                            ${course.title}
+                        </h3>
+
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-gray-500"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm">
+                                ${course.teacher_name}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span class="flex items-center">
+                                <i class="fas fa-users mr-2"></i>
+                                ${course.student_count} students
+                            </span>
+                        </div>
+
+                        <a href="/course/${course.id}" 
+                           class="block w-full text-center bg-violet-600 text-white py-2 rounded-lg hover:bg-violet-700 transition-colors">
+                            View Course
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+        coursesGrid.innerHTML = html;
+    }
+
+    function updatePagination(currentPage, totalPages) {
+        const paginationContainer = document.querySelector('nav[aria-label="Pagination"]');
+        if (!paginationContainer) return;
+        
+        let html = '';
+        
+        if (currentPage > 1) {
+            html += `<a href="?page=${currentPage - 1}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Previous</span>
+                <i class="fas fa-chevron-left"></i>
+            </a>`;
+        }
+        
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<a href="?page=${i}" 
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium 
+                ${i === currentPage ? 'text-violet-600 bg-violet-50' : 'text-gray-700 hover:bg-gray-50'}">
+                ${i}
+            </a>`;
+        }
+        
+        if (currentPage < totalPages) {
+            html += `<a href="?page=${currentPage + 1}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Next</span>
+                <i class="fas fa-chevron-right"></i>
+            </a>`;
+        }
+        
+        paginationContainer.innerHTML = html;
+    }
+
+    // Add event listeners for search and filters
     searchInput.addEventListener('input', filterCourses);
     categoryFilter.addEventListener('change', filterCourses);
     tagFilter.addEventListener('change', filterCourses);
 });
-
-function updateCoursesDisplay(courses) {
-    const coursesContainer = document.querySelector('.grid');
-    let html = '';
-    
-    courses.forEach(course => {
-        html += `
-            <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                <div class="h-48 rounded-t-xl relative overflow-hidden">
-                    ${course.thumbnail ? `
-                        <img src="${course.thumbnail}" 
-                             alt="${course.title}"
-                             class="w-full h-full object-cover">
-                    ` : `
-                        <div class="w-full h-full bg-gradient-to-r from-violet-500 to-purple-800 flex items-center justify-center">
-                            <i class="fas fa-graduation-cap text-white text-4xl"></i>
-                        </div>
-                    `}
-                    <span class="absolute top-4 left-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
-                        ${course.category_name}
-                    </span>
-                </div>
-
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-3">
-                        ${course.title}
-                    </h3>
-
-                    <div class="flex items-center mb-4">
-                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-gray-500"></i>
-                        </div>
-                        <span class="text-gray-600 text-sm">
-                            ${course.teacher_name}
-                        </span>
-                    </div>
-
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                        <span class="flex items-center">
-                            <i class="fas fa-users mr-2"></i>
-                            ${course.student_count} students
-                        </span>
-                    </div>
-
-                    <a href="/course/${course.id}" 
-                       class="block w-full text-center bg-violet-600 text-white py-2 rounded-lg hover:bg-violet-700 transition-colors">
-                        View Course
-                    </a>
-                </div>
-            </div>
-        `;
-    });
-    
-    coursesContainer.innerHTML = html;
-}
-
-function updatePagination(currentPage, totalPages) {
-    const paginationContainer = document.querySelector('nav[aria-label="Pagination"]');
-    let html = '';
-    
-    if (currentPage > 1) {
-        html += `<a href="?page=${currentPage - 1}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-            <span class="sr-only">Previous</span>
-            <i class="fas fa-chevron-left"></i>
-        </a>`;
-    }
-    
-    for (let i = 1; i <= totalPages; i++) {
-        html += `<a href="?page=${i}" 
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium 
-            ${i === currentPage ? 'text-violet-600 bg-violet-50' : 'text-gray-700 hover:bg-gray-50'}">
-            ${i}
-        </a>`;
-    }
-    
-    if (currentPage < totalPages) {
-        html += `<a href="?page=${currentPage + 1}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-            <span class="sr-only">Next</span>
-            <i class="fas fa-chevron-right"></i>
-        </a>`;
-    }
-    
-    paginationContainer.innerHTML = html;
-}
 </script>
 
 <?php require_once dirname(__DIR__) . '/layouts/footer.php'; ?> 

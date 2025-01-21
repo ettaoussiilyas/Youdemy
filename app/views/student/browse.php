@@ -136,94 +136,99 @@ document.addEventListener('DOMContentLoaded', function() {
     const tagFilter = document.getElementById('tagFilter');
     const coursesGrid = document.getElementById('coursesGrid');
 
+    let timeoutId;
+
     function filterCourses() {
-        const searchTerm = searchInput.value;
-        const selectedCategory = categoryFilter.value;
-        const selectedTag = tagFilter.value;
+        clearTimeout(timeoutId);
+        
+        timeoutId = setTimeout(() => {
+            const searchTerm = searchInput.value;
+            const selectedCategory = categoryFilter.value;
+            const selectedTag = tagFilter.value;
 
-        fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}`)
-            .then(response => response.json())
-            .then(courses => {
-                let html = '';
-                courses.forEach(course => {
-                    html += `
-                        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                            <!-- Course Image -->
-                            <div class="h-48 rounded-t-xl relative overflow-hidden">
-                                ${course.thumbnail ? `
-                                    <img src="${course.thumbnail}" 
-                                         alt="${course.title}"
-                                         class="w-full h-full object-cover">
-                                ` : `
-                                    <div class="w-full h-full bg-gradient-to-r from-violet-500 to-purple-800 flex items-center justify-center">
-                                        <i class="fas fa-graduation-cap text-white text-4xl"></i>
-                                    </div>
-                                `}
-                                <span class="absolute top-4 left-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
-                                    ${course.category_name}
-                                </span>
-                            </div>
-
-                            <!-- Course Content -->
-                            <div class="p-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="h-12 w-12 rounded-lg bg-violet-100 flex items-center justify-center">
-                                        <i class="fas fa-book text-violet-600 text-xl"></i>
-                                    </div>
-                                    <span class="px-3 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-600">
+            fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}`)
+                .then(response => response.json())
+                .then(courses => {
+                    let html = '';
+                    courses.forEach(course => {
+                        html += `
+                            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                <div class="h-48 rounded-t-xl relative overflow-hidden">
+                                    ${course.thumbnail ? `
+                                        <img src="${course.thumbnail}" 
+                                             alt="${course.title}"
+                                             class="w-full h-full object-cover">
+                                    ` : `
+                                        <div class="w-full h-full bg-gradient-to-r from-violet-500 to-purple-800 flex items-center justify-center">
+                                            <i class="fas fa-graduation-cap text-white text-4xl"></i>
+                                        </div>
+                                    `}
+                                    <span class="absolute top-4 left-4 bg-violet-600 text-white px-3 py-1 rounded-full text-sm">
                                         ${course.category_name}
                                     </span>
                                 </div>
-                                
-                                <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                                    ${course.title}
-                                </h3>
-                                
-                                <div class="flex items-center mb-4">
-                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
-                                        <i class="fas fa-user text-gray-500"></i>
+
+                                <div class="p-6">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="h-12 w-12 rounded-lg bg-violet-100 flex items-center justify-center">
+                                            <i class="fas fa-book text-violet-600 text-xl"></i>
+                                        </div>
+                                        <span class="px-3 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-600">
+                                            ${course.category_name}
+                                        </span>
                                     </div>
-                                    <span class="text-gray-600 text-sm">
-                                        ${course.teacher_name}
-                                    </span>
-                                </div>
+                                    
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                        ${course.title}
+                                    </h3>
+                                    
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                                            <i class="fas fa-user text-gray-500"></i>
+                                        </div>
+                                        <span class="text-gray-600 text-sm">
+                                            ${course.teacher_name}
+                                        </span>
+                                    </div>
 
-                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                    <span class="flex items-center">
-                                        <i class="fas fa-users mr-2"></i>
-                                        ${course.student_count} students
-                                    </span>
-                                </div>
+                                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                        <span class="flex items-center">
+                                            <i class="fas fa-users mr-2"></i>
+                                            ${course.student_count} students
+                                        </span>
+                                    </div>
 
-                                <div class="flex gap-2">
-                                    <a href="/student/course/details/${course.id}" 
-                                       class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-center rounded-lg hover:bg-gray-200 transition">
-                                        <i class="fas fa-info-circle mr-2"></i>
-                                        Details
-                                    </a>
-                                    ${course.is_enrolled ? `
-                                        <a href="/student/course/${course.id}" 
-                                           class="flex-1 px-4 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition">
-                                            <i class="fas fa-play-circle mr-2"></i>
-                                            Continue
+                                    <div class="flex gap-2">
+                                        <a href="/student/course/details/${course.id}" 
+                                           class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-center rounded-lg hover:bg-gray-200 transition">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            Details
                                         </a>
-                                    ` : `
-                                        <a href="/student/course/enroll/${course.id}" 
-                                           class="flex-1 px-4 py-2 bg-violet-600 text-white text-center rounded-lg hover:bg-violet-700 transition">
-                                            <i class="fas fa-plus-circle mr-2"></i>
-                                            Enroll
-                                        </a>
-                                    `}
+                                        ${course.is_enrolled ? `
+                                            <a href="/student/course/${course.id}" 
+                                               class="flex-1 px-4 py-2 bg-green-600 text-white text-center rounded-lg hover:bg-green-700 transition">
+                                                <i class="fas fa-play-circle mr-2"></i>
+                                                Continue
+                                            </a>
+                                        ` : `
+                                            <a href="/student/course/enroll/${course.id}" 
+                                               class="flex-1 px-4 py-2 bg-violet-600 text-white text-center rounded-lg hover:bg-violet-700 transition">
+                                                <i class="fas fa-plus-circle mr-2"></i>
+                                                Enroll
+                                            </a>
+                                        `}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                });
-                coursesGrid.innerHTML = html;
-            })
-            .catch(error => console.error('Error:', error));
+                        `;
+                    });
+                    coursesGrid.innerHTML = html;
+                })
+                .catch(error => console.error('Error:', error));
+        }, 300); // Add a small delay to prevent too many requests
     }
 
+    // Add event listeners for search and filters
     searchInput.addEventListener('input', filterCourses);
     categoryFilter.addEventListener('change', filterCourses);
     tagFilter.addEventListener('change', filterCourses);

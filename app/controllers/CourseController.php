@@ -70,24 +70,21 @@
         }
 
         public function filterCourses() {
-            $search = $_GET['search'] ?? '';
-            $category = $_GET['category'] ?? '';
-            $tag = $_GET['tag'] ?? '';
-            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            
-            $itemsPerPage = 8;
-            $offset = ($page - 1) * $itemsPerPage;
-            
-            $courses = $this->courseModel->searchCourses($search, $category, $tag, $itemsPerPage, $offset);
-            $totalCourses = $this->courseModel->getTotalFilteredCount($search, $category, $tag);
-            $totalPages = ceil($totalCourses / $itemsPerPage);
-            
-            header('Content-Type: application/json');
-            echo json_encode([
-                'courses' => $courses,
-                'currentPage' => $page,
-                'totalPages' => $totalPages
-            ]);
+            try {
+                $search = $_GET['search'] ?? '';
+                $category = $_GET['category'] ?? '';
+                $tag = $_GET['tag'] ?? '';
+                
+                $courses = $this->courseModel->searchCourses($search, $category, $tag);
+                
+                header('Content-Type: application/json');
+                echo json_encode($courses);
+                exit;
+            } catch (Exception $e) {
+                header('Content-Type: application/json');
+                echo json_encode(['error' => $e->getMessage()]);
+                exit;
+            }
         }
 
         public function browseCourses() {

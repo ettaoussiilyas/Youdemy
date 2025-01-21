@@ -627,7 +627,7 @@
             }
         }
 
-        public function searchCourses($search = '', $category = '', $tag = '', $limit = null, $offset = null) {
+        public function searchCourses($search = '', $category = '', $tag = '') {
             $sql = "SELECT DISTINCT 
                     c.*, 
                     cat.name as category_name,
@@ -644,7 +644,7 @@
                     LEFT JOIN enrollments e2 ON c.id = e2.course_id
                     WHERE 1=1";
             
-            $params = [$_SESSION['user_id'] ?? null];  // Handle case where user is not logged in
+            $params = [$_SESSION['user_id'] ?? null];
             
             if (!empty($search)) {
                 $sql .= " AND (c.title LIKE ? OR c.description LIKE ?)";
@@ -664,24 +664,9 @@
             
             $sql .= " GROUP BY c.id ORDER BY c.created_at DESC";
             
-            // Add pagination if limit and offset are provided
-            if ($limit !== null && $offset !== null) {
-                $sql .= " LIMIT ? OFFSET ?";
-                $params[] = (int)$limit;
-                $params[] = (int)$offset;
-            }
-            
             try {
                 $stmt = $this->conn->prepare($sql);
-                
-                // Bind parameters with their appropriate types
-                foreach ($params as $i => $param) {
-                    $stmt->bindValue($i + 1, $param, 
-                        is_int($param) ? PDO::PARAM_INT : PDO::PARAM_STR
-                    );
-                }
-                
-                $stmt->execute();
+                $stmt->execute($params);
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
                 error_log("Error in searchCourses: " . $e->getMessage());
