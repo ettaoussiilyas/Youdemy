@@ -627,7 +627,7 @@
             }
         }
 
-        public function searchCourses($search = '', $category = '', $tag = '') {
+        public function searchCourses($search = '', $category = '', $tag = '', $limit = null, $offset = null) {
             $sql = "SELECT DISTINCT 
                     c.*, 
                     cat.name as category_name,
@@ -662,30 +662,95 @@
                 $params[] = $tag;
             }
             
-            $sql .= " GROUP BY c.id ORDER BY student_count DESC";
+            $sql .= " GROUP BY c.id ORDER BY c.created_at DESC";
+            
+            // Add pagination if limit and offset are provided
+            if ($limit !== null && $offset !== null) {
+                $sql .= " LIMIT ? OFFSET ?";
+                $params[] = (int)$limit;
+                $params[] = (int)$offset;
+            }
             
             try {
                 $stmt = $this->conn->prepare($sql);
-                $stmt->execute($params);
-                $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                // Get tags for each course (maintaining existing functionality)
-                foreach ($courses as &$course) {
-                    $stmt = $this->conn->prepare("
-                        SELECT t.* 
-                        FROM tags t
-                        JOIN course_tags ct ON t.id = ct.tag_id
-                        WHERE ct.course_id = ?
-                    ");
-                    $stmt->execute([$course['id']]);
-                    $course['tags'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Bind parameters with their appropriate types
+                foreach ($params as $i => $param) {
+                    $stmt->bindValue($i + 1, $param, 
+                        is_int($param) ? PDO::PARAM_INT : PDO::PARAM_STR
+                    );
                 }
-
-                return $courses;
+                
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
                 error_log("Error in searchCourses: " . $e->getMessage());
                 return [];
             }
+        }
+
+        public function getTotalFilteredCount($search = '', $category = '', $tag = '') {
+            $sql = "SELECT COUNT(DISTINCT c.id) as total
+                    FROM courses c
+                    LEFT JOIN categories cat ON c.category_id = cat.id
+                    LEFT JOIN course_tags ct ON c.id = ct.course_id
+                    LEFT JOIN tags t ON ct.tag_id = t.id
+                    WHERE 1=1";
+            
+            $params = [];
+            
+            if (!empty($search)) {
+                $sql .= " AND (c.title LIKE ? OR c.description LIKE ?)";
+                $params[] = "%$search%";
+                $params[] = "%$search%";
+            }
+            
+            if (!empty($category)) {
+                $sql .= " AND c.category_id = ?";
+                $params[] = $category;
+            }
+            
+            if (!empty($tag)) {
+                $sql .= " AND t.id = ?";
+                $params[] = $tag;
+            }
+            
+            try {
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute($params);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return (int)$result['total'];
+            } catch (PDOException $e) {
+                error_log("Error in getTotalFilteredCount: " . $e->getMessage());
+                return 0;
+            }
+        }
+
+        public function getPaginatedCourses($limit, $offset) {
+            $sql = "SELECT 
+                    c.*, 
+                    cat.name as category_name,
+                    u.name as teacher_name,
+                    (SELECT COUNT(*) FROM enrollments WHERE course_id = c.id) as student_count
+                    FROM courses c
+                    LEFT JOIN categories cat ON c.category_id = cat.id
+                    LEFT JOIN users u ON c.teacher_id = u.id
+                    ORDER BY c.created_at DESC
+                    LIMIT ?, ?";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(1, $offset, PDO::PARAM_INT);  // Fix: explicitly bind as integers
+            $stmt->bindParam(2, $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        public function getTotalCoursesCount() {
+            $sql = "SELECT COUNT(*) as total FROM courses";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)$result['total'];
         }
 
     }

@@ -97,6 +97,35 @@
             </div>
         <?php endforeach; ?>
     </div>
+
+    <!-- After the Courses Grid -->
+    <div class="mt-8 flex justify-center">
+        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <?php if($currentPage > 1): ?>
+                <a href="?page=<?php echo $currentPage - 1; ?>" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Previous</span>
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            <?php endif; ?>
+            
+            <?php for($i = 1; $i <= $totalPages; $i++): ?>
+                <a href="?page=<?php echo $i; ?>" 
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium 
+                          <?php echo $i === $currentPage ? 'text-violet-600 bg-violet-50' : 'text-gray-700 hover:bg-gray-50'; ?>">
+                    <?php echo $i; ?>
+                </a>
+            <?php endfor; ?>
+            
+            <?php if($currentPage < $totalPages): ?>
+                <a href="?page=<?php echo $currentPage + 1; ?>" 
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">Next</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            <?php endif; ?>
+        </nav>
+    </div>
 </div>
 
 <!-- Add the same search script as Home page -->
@@ -110,11 +139,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchTerm = searchInput.value;
         const selectedCategory = categoryFilter.value;
         const selectedTag = tagFilter.value;
+        const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
 
-        fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}`)
+        fetch(`/api/courses/filter?search=${encodeURIComponent(searchTerm)}&category=${encodeURIComponent(selectedCategory)}&tag=${encodeURIComponent(selectedTag)}&page=${currentPage}`)
             .then(response => response.json())
             .then(data => {
-                updateCoursesDisplay(data);
+                updateCoursesDisplay(data.courses);
+                updatePagination(data.currentPage, data.totalPages);
             })
             .catch(error => console.error('Error:', error));
     }
@@ -177,6 +208,35 @@ function updateCoursesDisplay(courses) {
     });
     
     coursesContainer.innerHTML = html;
+}
+
+function updatePagination(currentPage, totalPages) {
+    const paginationContainer = document.querySelector('nav[aria-label="Pagination"]');
+    let html = '';
+    
+    if (currentPage > 1) {
+        html += `<a href="?page=${currentPage - 1}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <span class="sr-only">Previous</span>
+            <i class="fas fa-chevron-left"></i>
+        </a>`;
+    }
+    
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<a href="?page=${i}" 
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium 
+            ${i === currentPage ? 'text-violet-600 bg-violet-50' : 'text-gray-700 hover:bg-gray-50'}">
+            ${i}
+        </a>`;
+    }
+    
+    if (currentPage < totalPages) {
+        html += `<a href="?page=${currentPage + 1}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <span class="sr-only">Next</span>
+            <i class="fas fa-chevron-right"></i>
+        </a>`;
+    }
+    
+    paginationContainer.innerHTML = html;
 }
 </script>
 

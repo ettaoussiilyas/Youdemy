@@ -73,32 +73,51 @@
             $search = $_GET['search'] ?? '';
             $category = $_GET['category'] ?? '';
             $tag = $_GET['tag'] ?? '';
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             
-            $courses = $this->courseModel->searchCourses($search, $category, $tag);
+            $itemsPerPage = 8;
+            $offset = ($page - 1) * $itemsPerPage;
             
-            // Return JSON response
+            $courses = $this->courseModel->searchCourses($search, $category, $tag, $itemsPerPage, $offset);
+            $totalCourses = $this->courseModel->getTotalFilteredCount($search, $category, $tag);
+            $totalPages = ceil($totalCourses / $itemsPerPage);
+            
             header('Content-Type: application/json');
-            echo json_encode($courses);
+            echo json_encode([
+                'courses' => $courses,
+                'currentPage' => $page,
+                'totalPages' => $totalPages
+            ]);
         }
 
         public function browseCourses() {
             try {
-                // get all courses
-                $courses = $this->courseModel->getAllCourses();
+                // Pagination settings
+                $itemsPerPage = 8; // 8 courses per page (2x4 grid)
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $offset = ($currentPage - 1) * $itemsPerPage;
                 
-                // get all categories and tags for filtering
+                // Get paginated courses
+                $courses = $this->courseModel->getPaginatedCourses($itemsPerPage, $offset);
+                $totalCourses = $this->courseModel->getTotalCoursesCount();
+                $totalPages = ceil($totalCourses / $itemsPerPage);
+                
+                // Get categories and tags for filtering
                 $categories = $this->categoryModel->getAll();
                 $tags = $this->tagModel->getAll();
                 
-                // render the page
                 $this->render('course/browse', [
                     'courses' => $courses,
                     'categories' => $categories,
-                    'tags' => $tags
+                    'tags' => $tags,
+                    'currentPage' => $currentPage,
+                    'totalPages' => $totalPages
                 ]);
             } catch (Exception $e) {
-                $_SESSION['error'] = "Une erreur s'est produite.";
-                header('Location: /home');
+                $_SESSION['error'] = "An error occurred.";
+                // header('Location: /home');
+                //exeption handling
+                echo "An error occurred: " . $e->getMessage();
                 exit;
             }
         }
