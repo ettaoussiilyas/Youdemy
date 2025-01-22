@@ -10,7 +10,7 @@ class User extends Db {
 
     public function getAllUsers() {
         try {
-            $sql = "SELECT id, name, email, role, status FROM users";
+            $sql = "SELECT id, name, email, role, status FROM users where role  <> 'admin'";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
