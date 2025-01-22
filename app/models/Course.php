@@ -60,8 +60,9 @@
         }
 
         public function getCourseByCategory($category){
-            $sql = "";
-            $result = $this->query($sql);
+            $sql = "select * from courses where category_id = ?";
+            $result = $this->conn->prepare($sql);
+            $result->execute([$category]);
             return $result;
         }
 
